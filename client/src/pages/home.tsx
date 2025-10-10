@@ -120,6 +120,26 @@ export default function HomePage() {
     };
   }, [currentUser]);
 
+  // Auto-leave party when tab closes
+  useEffect(() => {
+    if (!currentUser || !currentParty) return;
+
+    const handleBeforeUnload = async () => {
+      try {
+        // Use sendBeacon for reliable sending during page unload
+        await partyService.leave(currentParty.id, currentUser.id, currentUser.displayName);
+      } catch (error) {
+        console.error('Failed to leave party on tab close:', error);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [currentUser, currentParty]);
+
   const handleSignOut = async () => {
     try {
       await signOut();
