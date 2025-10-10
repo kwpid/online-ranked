@@ -449,7 +449,7 @@ export function FriendsSidebar({
                   value={searchUsername}
                   onChange={(e) => setSearchUsername(e.target.value)}
                   placeholder="Username..."
-                  className="bg-background"
+                  className="bg-background text-foreground"
                   data-testid="input-add-friend-username"
                 />
               </div>
