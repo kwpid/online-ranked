@@ -6,6 +6,7 @@ import { PartyMemberCard } from '@/components/PartyMemberCard';
 import { FriendsSidebar } from '@/components/FriendsSidebar';
 import { ProfileModal } from '@/components/ProfileModal';
 import { SettingsModal } from '@/components/SettingsModal';
+import { PartyChatBox } from '@/components/PartyChatBox';
 import { useToast } from '@/hooks/use-toast';
 import { partyService } from '@/lib/firebaseService';
 import { 
@@ -610,6 +611,11 @@ export default function HomePage() {
         isOpen={settingsModalOpen}
         onClose={() => setSettingsModalOpen(false)}
       />
+
+      {/* Party Chat - Only show when in a party */}
+      {currentParty && (
+        <PartyChatBox partyId={currentParty.id} />
+      )}
     </div>
   );
 }
