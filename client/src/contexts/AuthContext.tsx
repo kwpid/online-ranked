@@ -97,6 +97,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
+  // Handle tab visibility changes - set offline when tab is not visible
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const userId = currentUser.id;
+
+    const handleVisibilityChange = async () => {
+      const userRef = doc(db, 'users', userId);
+      
+      if (document.hidden) {
+        // Tab is hidden, set status to offline
+        await updateDoc(userRef, { 
+          status: 'offline'
+        });
+      } else {
+        // Tab is visible, set status to online
+        await updateDoc(userRef, { 
+          status: 'online',
+          currentActivity: 'In Menu'
+        });
+      }
+    };
+
+    // Set initial status
+    if (!document.hidden) {
+      const userRef = doc(db, 'users', userId);
+      updateDoc(userRef, { 
+        status: 'online',
+        currentActivity: 'In Menu'
+      });
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Only set offline on unmount, not on every re-render
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [currentUser?.id]);
+
   const signInWithGoogle = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);

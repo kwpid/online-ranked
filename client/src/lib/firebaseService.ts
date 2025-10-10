@@ -169,7 +169,7 @@ export const friendService = {
       throw new Error('Request not found');
     }
 
-    const request = { ...requestSnap.data(), id: requestSnap.id };
+    const request = { ...requestSnap.data(), id: requestSnap.id } as { id: string; fromUserId: string; toUserId: string; status: string; createdAt: number; };
 
     // Create bidirectional friendships
     await addDoc(collection(db, 'friendships'), {

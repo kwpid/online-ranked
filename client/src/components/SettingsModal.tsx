@@ -114,9 +114,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange=
-
-{onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl bg-card text-card-foreground border-border">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-foreground">Settings</DialogTitle>
