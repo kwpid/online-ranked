@@ -68,6 +68,10 @@ Preferred communication style: Simple, everyday language.
 - Status and activity tracking
 - Username change cooldown (7 days)
 - Optional title and banner fields (coming soon)
+- Privacy Settings:
+  - Appearance Status: Choose how you appear to others (online/offline/do not disturb)
+  - Allow Friend Requests: Control who can send friend requests
+  - Allow Party Invites: Control who can send party invites
 
 ### Real-Time Features
 
