@@ -5,7 +5,7 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, googleProvider, db } from '@/lib/firebase';
 import { User, InsertUser } from '@shared/schema';
 
@@ -38,6 +38,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
   };
 
+  // Check if username exists and generate unique username if needed
+  const ensureUniqueUsername = async (baseUsername: string): Promise<string> => {
+    let username = baseUsername;
+    let counter = 1;
+    
+    while (true) {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('username', '==', username));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        return username;
+      }
+      
+      // Username exists, try with a number suffix
+      username = `${baseUsername}${counter}`;
+      counter++;
+    }
+  };
+
   // Create or get user profile from Firestore
   const createOrGetUserProfile = async (firebaseUser: FirebaseUser): Promise<User> => {
     const userRef = doc(db, 'users', firebaseUser.uid);
@@ -53,19 +73,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { ...userData, status: 'online', currentActivity: 'In Menu' };
     }
 
-    // Create new user profile
-    const username = generateUsername(firebaseUser.email || '');
+    // Create new user profile with unique username
+    const baseUsername = generateUsername(firebaseUser.email || '');
+    const uniqueUsername = await ensureUniqueUsername(baseUsername);
+    
     const newUser: User = {
       id: firebaseUser.uid,
       email: firebaseUser.email || '',
-      username,
-      displayName: firebaseUser.displayName || username,
+      username: uniqueUsername,
+      displayName: firebaseUser.displayName || uniqueUsername,
       photoURL: firebaseUser.photoURL,
       lastUsernameChange: null,
       title: null,
       banner: null,
       status: 'online',
       currentActivity: 'In Menu',
+      isAdmin: false,
       createdAt: Date.now(),
     };
 

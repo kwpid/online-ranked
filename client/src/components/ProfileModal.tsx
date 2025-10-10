@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { AdminBadge } from './AdminBadge';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -71,9 +72,16 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                 {displayName.slice(0, 2).toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
-            <p className="text-xs md:text-sm text-muted-foreground">
-              Preview of your profile picture
-            </p>
+            <div className="text-center">
+              <p className="text-xs md:text-sm text-muted-foreground mb-1">
+                Preview of your profile picture
+              </p>
+              {currentUser?.isAdmin && (
+                <div className="flex justify-center">
+                  <AdminBadge isAdmin={true} />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Display Name */}

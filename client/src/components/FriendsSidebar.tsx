@@ -16,6 +16,7 @@ import { X, UserPlus, UserMinus, Send, Check, XCircle, Users as UsersIcon } from
 import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { notificationService } from '@/lib/firebaseService';
+import { AdminBadge } from './AdminBadge';
 
 interface FriendsSidebarProps {
   isOpen: boolean;
@@ -341,7 +342,10 @@ export function FriendsSidebar({
                     }`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground truncate">{member.displayName}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-foreground truncate">{member.displayName}</p>
+                      <AdminBadge isAdmin={member.isAdmin} />
+                    </div>
                     <p className="text-xs text-muted-foreground truncate max-w-[180px]">
                       {member.status === 'online' ? (member.currentActivity || 'In Menu') : 'Offline'}
                     </p>
@@ -584,7 +588,10 @@ function FriendItem({
             }`} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-foreground truncate">{friend.displayName}</p>
+            <div className="flex items-center gap-2">
+              <p className="font-medium text-foreground truncate">{friend.displayName}</p>
+              <AdminBadge isAdmin={friend.isAdmin} />
+            </div>
             <p className="text-xs text-muted-foreground truncate max-w-[180px]">
               {friend.status === 'online' ? (friend.currentActivity || 'In Menu') : 'Offline'}
             </p>

@@ -12,6 +12,7 @@ export const userSchema = z.object({
   banner: z.string().nullable(), // Coming soon
   status: z.enum(['online', 'away', 'busy', 'offline']).default('online'),
   currentActivity: z.string().nullable(), // e.g., "In Menu", "In Game"
+  isAdmin: z.boolean().default(false), // Admin status
   createdAt: z.number(),
 });
 
@@ -23,12 +24,14 @@ export const insertUserSchema = userSchema.omit({
   title: true,
   banner: true,
   currentActivity: true,
+  isAdmin: true,
   createdAt: true 
 }).extend({
   lastUsernameChange: z.number().nullable().optional(),
   title: z.string().nullable().optional(),
   banner: z.string().nullable().optional(),
   currentActivity: z.string().nullable().optional(),
+  isAdmin: z.boolean().optional(),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

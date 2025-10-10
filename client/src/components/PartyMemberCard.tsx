@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Crown, UserX, UserCheck } from 'lucide-react';
+import { AdminBadge } from './AdminBadge';
 
 interface PartyMemberCardProps {
   user: User;
@@ -59,9 +60,12 @@ export function PartyMemberCard({
       </div>
 
       <div className="text-center">
-        <p className="text-lg font-semibold text-foreground" data-testid={`text-displayname-${user.id}`}>
-          {user.displayName}
-        </p>
+        <div className="flex items-center gap-2 justify-center">
+          <p className="text-lg font-semibold text-foreground" data-testid={`text-displayname-${user.id}`}>
+            {user.displayName}
+          </p>
+          <AdminBadge isAdmin={user.isAdmin} />
+        </div>
         {user.currentActivity && (
           <p className="text-sm text-muted-foreground truncate max-w-[180px]">
             {user.currentActivity}
