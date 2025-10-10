@@ -262,6 +262,42 @@ export function FriendsSidebar({
     }
   };
 
+  const handleAcceptPartyJoinRequest = async (notificationId: string, requesterId: string) => {
+    if (!currentUser) return;
+    
+    try {
+      await notificationService.acceptPartyJoinRequest(notificationId, requesterId);
+      
+      toast({
+        title: 'Request Accepted',
+        description: 'Player has joined your party',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to accept join request',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeclinePartyJoinRequest = async (notificationId: string) => {
+    try {
+      await notificationService.declinePartyJoinRequest(notificationId);
+      
+      toast({
+        title: 'Request Declined',
+        description: 'Party join request declined',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to decline request',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleRequestToJoinParty = async (friendId: string) => {
     if (!currentUser) return;
     
@@ -544,8 +580,30 @@ export function FriendsSidebar({
                     </Button>
                   </div>
                 )}
+
+                {notif.type === 'party_join_request' && notif.fromUserId && (
+                  <div className="flex gap-2 mt-3">
+                    <Button 
+                      size="sm" 
+                      onClick={() => handleAcceptPartyJoinRequest(notif.id, notif.fromUserId!)}
+                      data-testid={`button-accept-join-${notif.id}`}
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Accept
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleDeclinePartyJoinRequest(notif.id)}
+                      data-testid={`button-decline-join-${notif.id}`}
+                    >
+                      <XCircle className="h-4 w-4 mr-1" />
+                      Decline
+                    </Button>
+                  </div>
+                )}
                 
-                {notif.type !== 'party_invite' && (
+                {notif.type !== 'party_invite' && notif.type !== 'party_join_request' && (
                   <Button 
                     size="sm" 
                     variant="ghost"
