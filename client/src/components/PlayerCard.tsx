@@ -1,6 +1,7 @@
 import { User } from '@shared/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Crown } from 'lucide-react';
+import { getDisplayStatus, getStatusColor } from '@/lib/statusUtils';
 
 interface PlayerCardProps {
   user: User;
@@ -37,10 +38,7 @@ export function PlayerCard({ user, isLocalPlayer = false, isPartyLeader = false,
         
         {/* Online status indicator */}
         <div className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-background ${
-          user.status === 'online' ? 'bg-status-online' :
-          user.status === 'away' ? 'bg-status-away' :
-          user.status === 'busy' ? 'bg-status-busy' :
-          'bg-status-offline'
+          getStatusColor(getDisplayStatus(user))
         }`} />
       </div>
 

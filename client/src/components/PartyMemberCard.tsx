@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Crown, UserX, UserCheck } from 'lucide-react';
 import { AdminBadge } from './AdminBadge';
+import { getDisplayStatus, getStatusColor } from '@/lib/statusUtils';
 
 interface PartyMemberCardProps {
   user: User;
@@ -52,10 +53,7 @@ export function PartyMemberCard({
         )}
         
         <div className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-background ${
-          user.status === 'online' ? 'bg-status-online' :
-          user.status === 'away' ? 'bg-status-away' :
-          user.status === 'busy' ? 'bg-status-busy' :
-          'bg-status-offline'
+          getStatusColor(getDisplayStatus(user))
         }`} />
       </div>
 
