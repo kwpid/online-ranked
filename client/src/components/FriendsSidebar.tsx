@@ -48,7 +48,7 @@ export function FriendsSidebar({
   const [partyMembers, setPartyMembers] = useState<User[]>([]);
   const [isInParty, setIsInParty] = useState(false);
 
-  // Real-time friends listener
+  // Real-time friends listener with real-time status updates
   useEffect(() => {
     if (!currentUser) return;
 
@@ -57,7 +57,14 @@ export function FriendsSidebar({
       where('userId', '==', currentUser.id)
     );
 
-    const unsubscribe = onSnapshot(friendshipsQuery, async (snapshot) => {
+    // Track active friend listeners to clean them up properly
+    let friendUnsubscribers: (() => void)[] = [];
+
+    const unsubscribeFriendships = onSnapshot(friendshipsQuery, (snapshot) => {
+      // Clean up previous friend listeners before creating new ones
+      friendUnsubscribers.forEach(unsub => unsub());
+      friendUnsubscribers = [];
+
       const friendIds = snapshot.docs.map(doc => doc.data().friendId);
       
       if (friendIds.length === 0) {
@@ -65,19 +72,26 @@ export function FriendsSidebar({
         return;
       }
 
-      // Fetch friend user data
-      const friendsData: User[] = [];
-      for (const friendId of friendIds) {
+      // Set up real-time listeners for each friend's user data
+      const friendsMap = new Map<string, User>();
+
+      friendIds.forEach((friendId) => {
         const userDocRef = doc(db, 'users', friendId);
-        const userSnap = await getDoc(userDocRef);
-        if (userSnap.exists()) {
-          friendsData.push({ ...userSnap.data(), id: userSnap.id } as User);
-        }
-      }
-      setFriends(friendsData);
+        const unsubscribe = onSnapshot(userDocRef, (userSnap) => {
+          if (userSnap.exists()) {
+            friendsMap.set(friendId, { ...userSnap.data(), id: userSnap.id } as User);
+            // Update friends state with current map values
+            setFriends(Array.from(friendsMap.values()));
+          }
+        });
+        friendUnsubscribers.push(unsubscribe);
+      });
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeFriendships();
+      friendUnsubscribers.forEach(unsub => unsub());
+    };
   }, [currentUser]);
 
   // Real-time notifications listener
@@ -133,7 +147,7 @@ export function FriendsSidebar({
     return unsubscribe;
   }, [currentUser]);
 
-  // Real-time party listener
+  // Real-time party listener with real-time member status updates
   useEffect(() => {
     if (!currentUser) return;
 
@@ -142,7 +156,14 @@ export function FriendsSidebar({
       where('memberIds', 'array-contains', currentUser.id)
     );
 
-    const unsubscribe = onSnapshot(partiesQuery, async (snapshot) => {
+    // Track active member listeners to clean them up properly
+    let memberUnsubscribers: (() => void)[] = [];
+
+    const unsubscribeParty = onSnapshot(partiesQuery, (snapshot) => {
+      // Clean up previous member listeners before creating new ones
+      memberUnsubscribers.forEach(unsub => unsub());
+      memberUnsubscribers = [];
+
       if (snapshot.empty) {
         setIsInParty(false);
         setPartyMembers([]);
@@ -152,19 +173,26 @@ export function FriendsSidebar({
       setIsInParty(true);
       const party = snapshot.docs[0].data();
       
-      // Fetch party members
-      const members: User[] = [];
-      for (const memberId of party.memberIds) {
+      // Set up real-time listeners for each party member's user data
+      const membersMap = new Map<string, User>();
+
+      party.memberIds.forEach((memberId: string) => {
         const memberDocRef = doc(db, 'users', memberId);
-        const memberSnap = await getDoc(memberDocRef);
-        if (memberSnap.exists()) {
-          members.push({ ...memberSnap.data(), id: memberSnap.id } as User);
-        }
-      }
-      setPartyMembers(members);
+        const unsubscribe = onSnapshot(memberDocRef, (memberSnap) => {
+          if (memberSnap.exists()) {
+            membersMap.set(memberId, { ...memberSnap.data(), id: memberSnap.id } as User);
+            // Update party members state with current map values
+            setPartyMembers(Array.from(membersMap.values()));
+          }
+        });
+        memberUnsubscribers.push(unsubscribe);
+      });
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeParty();
+      memberUnsubscribers.forEach(unsub => unsub());
+    };
   }, [currentUser]);
 
   const onlineFriends = friends.filter(f => f.status === 'online');

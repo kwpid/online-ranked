@@ -97,53 +97,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  // Handle tab visibility changes and periodic activity updates
+  // Handle tab close and periodic activity updates
   useEffect(() => {
     if (!currentUser) return;
 
     const userId = currentUser.id;
 
-    const handleVisibilityChange = async () => {
+    // Handle tab/window close - set status to offline
+    // Using pagehide event which is more reliable than beforeunload
+    const handlePageHide = () => {
       const userRef = doc(db, 'users', userId);
-      
-      if (document.hidden) {
-        // Tab is hidden, set status to offline
-        await updateDoc(userRef, { 
-          status: 'offline'
-        });
-      } else {
-        // Tab is visible, set status to online
-        await updateDoc(userRef, { 
-          status: 'online',
-          currentActivity: 'In Menu'
-        });
-      }
+      // Best effort attempt to update status on page close
+      // Note: This may not always complete before the page unloads
+      updateDoc(userRef, { 
+        status: 'offline'
+      }).catch(() => {
+        // Silently fail - this is expected during page unload
+      });
     };
 
-    // Set initial status
-    if (!document.hidden) {
+    // Set initial status to online
+    const userRef = doc(db, 'users', userId);
+    updateDoc(userRef, { 
+      status: 'online',
+      currentActivity: 'In Menu'
+    });
+
+    // Periodic activity update (every 30 seconds) - keeps user online regardless of tab visibility
+    const activityInterval = setInterval(async () => {
       const userRef = doc(db, 'users', userId);
-      updateDoc(userRef, { 
+      await updateDoc(userRef, { 
         status: 'online',
         currentActivity: 'In Menu'
       });
-    }
-
-    // Periodic activity update (every 30 seconds)
-    const activityInterval = setInterval(async () => {
-      if (!document.hidden) {
-        const userRef = doc(db, 'users', userId);
-        await updateDoc(userRef, { 
-          status: 'online',
-          currentActivity: 'In Menu'
-        });
-      }
     }, 30000); // 30 seconds
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Listen for tab/window close - use both events for better coverage
+    window.addEventListener('pagehide', handlePageHide);
+    window.addEventListener('beforeunload', handlePageHide);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handlePageHide);
+      window.removeEventListener('beforeunload', handlePageHide);
       clearInterval(activityInterval);
     };
   }, [currentUser?.id]);

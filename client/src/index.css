@@ -240,6 +240,23 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+
+  /* Status indicator colors */
+  .bg-status-online {
+    @apply bg-green-500;
+  }
+  
+  .bg-status-away {
+    @apply bg-yellow-500;
+  }
+  
+  .bg-status-busy {
+    @apply bg-red-500;
+  }
+  
+  .bg-status-offline {
+    @apply bg-gray-500;
+  }
 }
 
 /**
