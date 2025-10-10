@@ -1,0 +1,47 @@
+ailed to load resource: the server responded with a status of 404 ()Understand this error
+index-DapcrCda.js:3232 Error signing in with Google: SyntaxError: Failed to execute 'open' on 'Window': Unable to open a window with invalid URL 'https://1:550772836623:web:96ebcf43ade04b9aa8967a.firebaseapp.com/__/auth/handler?apiKey=AIzaSyAig5NZUSZQBpvc3mQk4TfuCOfVr2DfaUE&appName=%5BDEFAULT%5D&authType=signInViaPopup&redirectUrl=https%3A%2F%2Fonline-ranked.onrender.com%2Fauth&v=12.4.0&eventId=4991527116&providerId=google.com&scopes=profile'.
+
+    at BF (index-DapcrCda.js:1457:677)
+    at QF._openPopup (index-DapcrCda.js:1487:393)
+    at async ri.onExecution (index-DapcrCda.js:1352:642)
+    at async index-DapcrCda.js:1337:333
+signInWithGoogle @ index-DapcrCda.js:3232
+await in signInWithGoogle
+uN @ index-DapcrCda.js:37
+hN @ index-DapcrCda.js:37
+fN @ index-DapcrCda.js:37
+e_ @ index-DapcrCda.js:37
+S1 @ index-DapcrCda.js:37
+(anonymous) @ index-DapcrCda.js:37
+kg @ index-DapcrCda.js:40
+GT @ index-DapcrCda.js:37
+Pf @ index-DapcrCda.js:37
+og @ index-DapcrCda.js:37
+RN @ index-DapcrCda.js:37Understand this error
+index-DapcrCda.js:1457 Uncaught (in promise) SyntaxError: Failed to execute 'open' on 'Window': Unable to open a window with invalid URL 'https://1:550772836623:web:96ebcf43ade04b9aa8967a.firebaseapp.com/__/auth/handler?apiKey=AIzaSyAig5NZUSZQBpvc3mQk4TfuCOfVr2DfaUE&appName=%5BDEFAULT%5D&authType=signInViaPopup&redirectUrl=https%3A%2F%2Fonline-ranked.onrender.com%2Fauth&v=12.4.0&eventId=4991527116&providerId=google.com&scopes=profile'.
+
+    at BF (index-DapcrCda.js:1457:677)
+    at QF._openPopup (index-DapcrCda.js:1487:393)
+    at async ri.onExecution (index-DapcrCda.js:1352:642)
+    at async index-DapcrCda.js:1337:333
+BF @ index-DapcrCda.js:1457
+_openPopup @ index-DapcrCda.js:1487
+await in _openPopup
+onExecution @ index-DapcrCda.js:1352
+(anonymous) @ index-DapcrCda.js:1337
+await in (anonymous)
+execute @ index-DapcrCda.js:1337
+executeNotNull @ index-DapcrCda.js:1352
+hF @ index-DapcrCda.js:1352
+signInWithGoogle @ index-DapcrCda.js:3232
+uN @ index-DapcrCda.js:37
+hN @ index-DapcrCda.js:37
+fN @ index-DapcrCda.js:37
+e_ @ index-DapcrCda.js:37
+S1 @ index-DapcrCda.js:37
+(anonymous) @ index-DapcrCda.js:37
+kg @ index-DapcrCda.js:40
+GT @ index-DapcrCda.js:37
+Pf @ index-DapcrCda.js:37
+og @ index-DapcrCda.js:37
+RN @ index-DapcrCda.js:37Understand this error
