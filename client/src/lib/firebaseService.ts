@@ -14,6 +14,39 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 
+// Helper function to send party system messages
+async function sendPartySystemMessage(
+  partyId: string, 
+  displayName: string, 
+  messageType: 'join' | 'leave' | 'promote' | 'kick'
+) {
+  let message = '';
+  switch (messageType) {
+    case 'join':
+      message = `${displayName} joined the party`;
+      break;
+    case 'leave':
+      message = `${displayName} left the party`;
+      break;
+    case 'promote':
+      message = `${displayName} was promoted to party leader`;
+      break;
+    case 'kick':
+      message = `${displayName} was removed from the party`;
+      break;
+  }
+  
+  await addDoc(collection(db, 'partyMessages'), {
+    partyId,
+    userId: null,
+    displayName: 'System',
+    message,
+    isSystemMessage: true,
+    systemMessageType: messageType,
+    createdAt: Date.now(),
+  });
+}
+
 // Party Operations
 export const partyService = {
   async create(userId: string) {
@@ -24,14 +57,17 @@ export const partyService = {
     });
   },
 
-  async join(partyId: string, userId: string) {
+  async join(partyId: string, userId: string, userDisplayName: string) {
     const partyRef = doc(db, 'parties', partyId);
     await updateDoc(partyRef, {
       memberIds: arrayUnion(userId),
     });
+    
+    // Send system message
+    await sendPartySystemMessage(partyId, userDisplayName, 'join');
   },
 
-  async leave(partyId: string, userId: string) {
+  async leave(partyId: string, userId: string, userDisplayName: string) {
     const partyRef = doc(db, 'parties', partyId);
     const partySnap = await getDoc(partyRef);
     
@@ -39,6 +75,9 @@ export const partyService = {
     
     const party = partySnap.data();
     const newMemberIds = party.memberIds.filter((id: string) => id !== userId);
+    
+    // Send leave system message before any cleanup
+    await sendPartySystemMessage(partyId, userDisplayName, 'leave');
     
     // If no members left, delete party and cleanup messages
     if (newMemberIds.length === 0) {
@@ -52,11 +91,24 @@ export const partyService = {
     
     // If leader left, promote first member
     let updates: any = { memberIds: newMemberIds };
+    let wasLeader = false;
     if (party.leaderId === userId) {
       updates.leaderId = newMemberIds[0];
+      wasLeader = true;
     }
     
     await updateDoc(partyRef, updates);
+    
+    // Send promotion system message if leader left
+    if (wasLeader) {
+      // Get the new leader's display name
+      const newLeaderRef = doc(db, 'users', newMemberIds[0]);
+      const newLeaderSnap = await getDoc(newLeaderRef);
+      if (newLeaderSnap.exists()) {
+        const newLeaderData = newLeaderSnap.data();
+        await sendPartySystemMessage(partyId, newLeaderData.displayName, 'promote');
+      }
+    }
   },
 
   async kick(partyId: string, userId: string, kickedBy: string) {
@@ -72,9 +124,17 @@ export const partyService = {
       throw new Error('Only party leader can kick members');
     }
     
+    // Get kicked user's display name for system message
+    const kickedUserRef = doc(db, 'users', userId);
+    const kickedUserSnap = await getDoc(kickedUserRef);
+    const kickedUserDisplayName = kickedUserSnap.exists() ? kickedUserSnap.data().displayName : 'Unknown';
+    
     await updateDoc(partyRef, {
       memberIds: arrayRemove(userId),
     });
+    
+    // Send system message
+    await sendPartySystemMessage(partyId, kickedUserDisplayName, 'kick');
     
     // Send notification to kicked user
     await addDoc(collection(db, 'notifications'), {
@@ -103,9 +163,17 @@ export const partyService = {
       throw new Error('Only party leader can promote members');
     }
     
+    // Get new leader's display name for system message
+    const newLeaderRef = doc(db, 'users', newLeaderId);
+    const newLeaderSnap = await getDoc(newLeaderRef);
+    const newLeaderDisplayName = newLeaderSnap.exists() ? newLeaderSnap.data().displayName : 'Unknown';
+    
     await updateDoc(partyRef, {
       leaderId: newLeaderId,
     });
+    
+    // Send system message
+    await sendPartySystemMessage(partyId, newLeaderDisplayName, 'promote');
   },
 };
 
@@ -275,8 +343,13 @@ export const notificationService = {
       throw new Error('Already in a party');
     }
 
+    // Get user's display name
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+    const userDisplayName = userSnap.exists() ? userSnap.data().displayName : 'Unknown';
+    
     // Join the party
-    await partyService.join(notification.partyId, userId);
+    await partyService.join(notification.partyId, userId, userDisplayName);
     
     // Mark notification as read
     await updateDoc(notifRef, { read: true });

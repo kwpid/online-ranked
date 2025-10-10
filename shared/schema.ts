@@ -13,6 +13,15 @@ export const userSchema = z.object({
   status: z.enum(['online', 'away', 'busy', 'offline']).default('online'),
   currentActivity: z.string().nullable(), // e.g., "In Menu", "In Game"
   isAdmin: z.boolean().default(false), // Admin status
+  settings: z.object({
+    allowFriendRequests: z.boolean().default(true),
+    allowPartyInvites: z.boolean().default(true),
+    appearanceStatus: z.enum(['online', 'offline', 'dnd']).default('online'),
+  }).default({
+    allowFriendRequests: true,
+    allowPartyInvites: true,
+    appearanceStatus: 'online',
+  }),
   createdAt: z.number(),
 });
 
@@ -86,7 +95,7 @@ export type InsertParty = z.infer<typeof insertPartySchema>;
 export const notificationSchema = z.object({
   id: z.string(),
   userId: z.string(), // Who receives the notification
-  type: z.enum(['friend_request', 'party_invite', 'party_kick', 'friend_accepted']),
+  type: z.enum(['friend_request', 'party_invite', 'party_kick', 'friend_accepted', 'party_join_request']),
   fromUserId: z.string().nullable(), // Who sent it
   fromUserDisplayName: z.string().nullable(),
   fromUserPhotoURL: z.string().nullable(),
@@ -120,9 +129,11 @@ export type RecentlyPlayed = z.infer<typeof recentlyPlayedSchema>;
 export const partyMessageSchema = z.object({
   id: z.string(),
   partyId: z.string(),
-  userId: z.string(),
+  userId: z.string().nullable(),
   displayName: z.string(),
   message: z.string(),
+  isSystemMessage: z.boolean().default(false),
+  systemMessageType: z.enum(['join', 'leave', 'promote', 'kick']).nullable(),
   createdAt: z.number(),
 });
 

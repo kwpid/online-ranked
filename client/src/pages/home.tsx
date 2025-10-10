@@ -404,7 +404,7 @@ export default function HomePage() {
     if (!currentUser || !currentParty) return;
 
     try {
-      await partyService.leave(currentParty.id, currentUser.id);
+      await partyService.leave(currentParty.id, currentUser.id, currentUser.displayName);
       
       toast({
         title: 'Left Party',

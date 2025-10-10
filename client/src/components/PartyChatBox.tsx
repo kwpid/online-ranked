@@ -114,27 +114,48 @@ export function PartyChatBox({ partyId }: PartyChatBoxProps) {
               No messages yet. Start the conversation!
             </div>
           ) : (
-            messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`p-2 rounded-lg ${
-                  msg.userId === currentUser?.id
-                    ? 'bg-primary/10 ml-4'
-                    : 'bg-secondary/50 mr-4'
-                }`}
-              >
-                <p className="text-sm">
-                  <span className="font-semibold text-foreground">
-                    {msg.displayName}
-                  </span>
-                  <span className="text-muted-foreground"> : </span>
-                  <span className="text-foreground">{msg.message}</span>
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {new Date(msg.createdAt).toLocaleTimeString()}
-                </p>
-              </div>
-            ))
+            messages.map((msg) => {
+              // Render system messages differently
+              if (msg.isSystemMessage) {
+                return (
+                  <div
+                    key={msg.id}
+                    className="flex justify-center my-2"
+                    data-testid={`system-message-${msg.id}`}
+                  >
+                    <div className="px-3 py-1 bg-muted/50 rounded-full">
+                      <p className="text-xs text-muted-foreground text-center italic">
+                        {msg.message}
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+              
+              // Render regular messages
+              return (
+                <div
+                  key={msg.id}
+                  className={`p-2 rounded-lg ${
+                    msg.userId === currentUser?.id
+                      ? 'bg-primary/10 ml-4'
+                      : 'bg-secondary/50 mr-4'
+                  }`}
+                  data-testid={`message-${msg.id}`}
+                >
+                  <p className="text-sm">
+                    <span className="font-semibold text-foreground">
+                      {msg.displayName}
+                    </span>
+                    <span className="text-muted-foreground"> : </span>
+                    <span className="text-foreground">{msg.message}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {new Date(msg.createdAt).toLocaleTimeString()}
+                  </p>
+                </div>
+              );
+            })
           )}
         </div>
       </ScrollArea>
