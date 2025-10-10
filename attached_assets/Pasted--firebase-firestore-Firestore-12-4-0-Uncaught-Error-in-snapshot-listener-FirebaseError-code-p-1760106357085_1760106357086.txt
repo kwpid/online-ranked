@@ -1,0 +1,144 @@
+@firebase/firestore: Firestore (12.4.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions.
+defaultLogHandler @ chunk-B3OT22E3.js?v=fbf438a9:1211Understand this error
+PartyChatBox.tsx:65 Failed to send message: FirebaseError: Missing or insufficient permissions.
+handleSendMessage @ PartyChatBox.tsx:65Understand this error
+firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fpokeronlinev2%2Fdatabases%2F(default)&gsessionid=DBU1smc27NWlr0XrHZfJNbs807jV0lz6Lv6LDZR8zYg&SID=bN1tgKQ50XA6-ZxX9SkGEQ&RID=43372&TYPE=terminate&zx=72devkh22zwk:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+PartyChatBox.tsx:65 Failed to send message: FirebaseError: Missing or insufficient permissions.
+handleSendMessage @ PartyChatBox.tsx:65Understand this error
+firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fpokeronlinev2%2Fdatabases%2F(default)&gsessionid=WHPEL7mZcfwhwq_6Wpinaf3Fl0DGvVRmEZ3D7odms94&SID=rgW7UPXoq5G9dxea7VfGtA&RID=81598&TYPE=terminate&zx=khzt1z8glz8f:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+PartyChatBox.tsx:65 Failed to send message: FirebaseError: Missing or insufficient permissions.
+handleSendMessage @ PartyChatBox.tsx:65
+await in handleSendMessage
+callCallback2 @ chunk-WERSD76P.js?v=fbf438a9:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=fbf438a9:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=fbf438a9:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=fbf438a9:3736
+executeDispatch @ chunk-WERSD76P.js?v=fbf438a9:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=fbf438a9:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=fbf438a9:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=fbf438a9:7051
+(anonymous) @ chunk-WERSD76P.js?v=fbf438a9:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=fbf438a9:18913
+batchedUpdates @ chunk-WERSD76P.js?v=fbf438a9:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=fbf438a9:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=fbf438a9:5478
+dispatchEvent @ chunk-WERSD76P.js?v=fbf438a9:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js?v=fbf438a9:5449Understand this error
+PartyChatBox.tsx:55  POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fpokeronlinev2%2Fdatabases%2F(default)&gsessionid=rPtYmqpSLIkT43bB4i2TnXRfc0DgPTmpr9L6bUouktc&SID=dzNRJ8uyHPaci_0l1R4KSw&RID=3078&TYPE=terminate&zx=ymc4gf40m4c 400 (Bad Request)
+cc @ firebase_firestore.js?v=fbf438a9:2073
+Y2.close @ firebase_firestore.js?v=fbf438a9:2428
+(anonymous) @ firebase_firestore.js?v=fbf438a9:12629
+(anonymous) @ firebase_firestore.js?v=fbf438a9:12593
+Va @ firebase_firestore.js?v=fbf438a9:920
+D @ firebase_firestore.js?v=fbf438a9:888
+Z2.qa @ firebase_firestore.js?v=fbf438a9:2477
+Lb @ firebase_firestore.js?v=fbf438a9:1387
+N2.Y @ firebase_firestore.js?v=fbf438a9:1238
+N2.ba @ firebase_firestore.js?v=fbf438a9:1189
+Va @ firebase_firestore.js?v=fbf438a9:920
+D @ firebase_firestore.js?v=fbf438a9:888
+Qc @ firebase_firestore.js?v=fbf438a9:1885
+h.Xa @ firebase_firestore.js?v=fbf438a9:1880
+h.Ca @ firebase_firestore.js?v=fbf438a9:1877
+Gc @ firebase_firestore.js?v=fbf438a9:1778
+h.Ma @ firebase_firestore.js?v=fbf438a9:1745
+Promise.then
+Ic @ firebase_firestore.js?v=fbf438a9:1736
+h.Ma @ firebase_firestore.js?v=fbf438a9:1746
+Promise.then
+Ic @ firebase_firestore.js?v=fbf438a9:1736
+h.Pa @ firebase_firestore.js?v=fbf438a9:1732
+Promise.then
+h.send @ firebase_firestore.js?v=fbf438a9:1712
+h.ea @ firebase_firestore.js?v=fbf438a9:1853
+Eb @ firebase_firestore.js?v=fbf438a9:1182
+$c @ firebase_firestore.js?v=fbf438a9:2278
+h.Da @ firebase_firestore.js?v=fbf438a9:2245
+sa @ firebase_firestore.js?v=fbf438a9:624
+Promise.then
+u @ firebase_firestore.js?v=fbf438a9:618
+ac @ firebase_firestore.js?v=fbf438a9:2231
+Lb @ firebase_firestore.js?v=fbf438a9:1384
+N2.Y @ firebase_firestore.js?v=fbf438a9:1238
+N2.ba @ firebase_firestore.js?v=fbf438a9:1189
+Va @ firebase_firestore.js?v=fbf438a9:920
+D @ firebase_firestore.js?v=fbf438a9:888
+Qc @ firebase_firestore.js?v=fbf438a9:1885
+h.Xa @ firebase_firestore.js?v=fbf438a9:1880
+h.Ca @ firebase_firestore.js?v=fbf438a9:1877
+Gc @ firebase_firestore.js?v=fbf438a9:1778
+h.Ma @ firebase_firestore.js?v=fbf438a9:1745
+Promise.then
+Ic @ firebase_firestore.js?v=fbf438a9:1736
+h.Pa @ firebase_firestore.js?v=fbf438a9:1732
+Promise.then
+h.send @ firebase_firestore.js?v=fbf438a9:1712
+h.ea @ firebase_firestore.js?v=fbf438a9:1853
+Eb @ firebase_firestore.js?v=fbf438a9:1177
+Cb @ firebase_firestore.js?v=fbf438a9:1152
+h.Ea @ firebase_firestore.js?v=fbf438a9:2154
+sa @ firebase_firestore.js?v=fbf438a9:624
+Promise.then
+u @ firebase_firestore.js?v=fbf438a9:618
+bc @ firebase_firestore.js?v=fbf438a9:2098
+h.connect @ firebase_firestore.js?v=fbf438a9:2058
+Y2.m @ firebase_firestore.js?v=fbf438a9:2425
+Yo @ firebase_firestore.js?v=fbf438a9:12587
+send @ firebase_firestore.js?v=fbf438a9:12478
+q_ @ firebase_firestore.js?v=fbf438a9:12795
+ra @ firebase_firestore.js?v=fbf438a9:12998
+__PRIVATE_onWriteStreamOpen @ firebase_firestore.js?v=fbf438a9:13350
+(anonymous) @ firebase_firestore.js?v=fbf438a9:12873
+(anonymous) @ firebase_firestore.js?v=fbf438a9:12897
+(anonymous) @ firebase_firestore.js?v=fbf438a9:15988
+(anonymous) @ firebase_firestore.js?v=fbf438a9:16019
+Promise.then
+cc @ firebase_firestore.js?v=fbf438a9:16019
+enqueue @ firebase_firestore.js?v=fbf438a9:15988
+enqueueAndForget @ firebase_firestore.js?v=fbf438a9:15970
+(anonymous) @ firebase_firestore.js?v=fbf438a9:12897
+(anonymous) @ firebase_firestore.js?v=fbf438a9:12873
+__ @ firebase_firestore.js?v=fbf438a9:12484
+(anonymous) @ firebase_firestore.js?v=fbf438a9:12635
+setTimeout
+T_ @ firebase_firestore.js?v=fbf438a9:12634
+j_ @ firebase_firestore.js?v=fbf438a9:12977
+G_ @ firebase_firestore.js?v=fbf438a9:12870
+(anonymous) @ firebase_firestore.js?v=fbf438a9:12860
+Promise.then
+auth @ firebase_firestore.js?v=fbf438a9:12856
+start @ firebase_firestore.js?v=fbf438a9:12755
+start @ firebase_firestore.js?v=fbf438a9:12971
+__PRIVATE_startWriteStream @ firebase_firestore.js?v=fbf438a9:13347
+__PRIVATE_fillWritePipeline @ firebase_firestore.js?v=fbf438a9:13333
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ firebase_firestore.js?v=fbf438a9:14351
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firebase_firestore.js?v=fbf438a9:18003
+await in (anonymous)
+(anonymous) @ firebase_firestore.js?v=fbf438a9:15988
+(anonymous) @ firebase_firestore.js?v=fbf438a9:16019
+Promise.then
+cc @ firebase_firestore.js?v=fbf438a9:16019
+enqueue @ firebase_firestore.js?v=fbf438a9:15988
+enqueueAndForget @ firebase_firestore.js?v=fbf438a9:15970
+__PRIVATE_firestoreClientWrite @ firebase_firestore.js?v=fbf438a9:18003
+executeWrite @ firebase_firestore.js?v=fbf438a9:18004
+addDoc @ firebase_firestore.js?v=fbf438a9:17852
+handleSendMessage @ PartyChatBox.tsx:55
+callCallback2 @ chunk-WERSD76P.js?v=fbf438a9:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=fbf438a9:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=fbf438a9:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=fbf438a9:3736
+executeDispatch @ chunk-WERSD76P.js?v=fbf438a9:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=fbf438a9:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=fbf438a9:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=fbf438a9:7051
+(anonymous) @ chunk-WERSD76P.js?v=fbf438a9:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=fbf438a9:18913
+batchedUpdates @ chunk-WERSD76P.js?v=fbf438a9:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=fbf438a9:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=fbf438a9:5478
+dispatchEvent @ chunk-WERSD76P.js?v=fbf438a9:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js?v=fbf438a9:5449Understand this error
+chunk-B3OT22E3.js?v=fbf438a9:1211 [2025-10-10T14:25:02.767Z]  @firebase/firestore: Firestore (12.4.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions.

@@ -66,7 +66,7 @@ export function PartyChatBox({ partyId }: PartyChatBoxProps) {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -144,7 +144,7 @@ export function PartyChatBox({ partyId }: PartyChatBoxProps) {
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             className="flex-1 bg-background text-foreground"
             maxLength={500}
