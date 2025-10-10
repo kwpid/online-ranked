@@ -26,7 +26,6 @@ export function PartyChatBox({ partyId }: PartyChatBoxProps) {
     const messagesQuery = query(
       collection(db, 'partyMessages'),
       where('partyId', '==', partyId),
-      orderBy('createdAt', 'desc'),
       limit(50)
     );
 
@@ -35,7 +34,9 @@ export function PartyChatBox({ partyId }: PartyChatBoxProps) {
         ...doc.data(),
         id: doc.id
       } as PartyMessage));
-      setMessages(msgs.reverse());
+      // Sort by createdAt in JavaScript instead of Firestore
+      msgs.sort((a, b) => a.createdAt - b.createdAt);
+      setMessages(msgs);
     });
 
     return unsubscribe;

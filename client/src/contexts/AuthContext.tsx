@@ -84,10 +84,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const userProfile = await createOrGetUserProfile(firebaseUser);
           setCurrentUser(userProfile);
-          
-          // Run cleanup tasks in background (don't await)
-          notificationService.cleanupOldNotifications(firebaseUser.uid).catch(console.error);
-          cleanupService.cleanupOldFriendRequests(firebaseUser.uid).catch(console.error);
         } catch (error) {
           console.error('Error loading user profile:', error);
           setCurrentUser(null);
