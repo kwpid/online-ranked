@@ -43,6 +43,7 @@ export function FriendsSidebar({
   const [friends, setFriends] = useState<User[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [friendRequestUsers, setFriendRequestUsers] = useState<Map<string, User>>(new Map());
   const [recentlyPlayed, setRecentlyPlayed] = useState<User[]>([]);
   const [partyMembers, setPartyMembers] = useState<User[]>([]);
   const [isInParty, setIsInParty] = useState(false);
@@ -110,12 +111,23 @@ export function FriendsSidebar({
       where('status', '==', 'pending')
     );
 
-    const unsubscribe = onSnapshot(requestsQuery, (snapshot) => {
+    const unsubscribe = onSnapshot(requestsQuery, async (snapshot) => {
       const requests = snapshot.docs.map(doc => ({ 
         ...doc.data(), 
         id: doc.id 
       } as FriendRequest));
       setFriendRequests(requests);
+
+      // Fetch user data for each friend request
+      const usersMap = new Map<string, User>();
+      for (const request of requests) {
+        const userDocRef = doc(db, 'users', request.fromUserId);
+        const userSnap = await getDoc(userDocRef);
+        if (userSnap.exists()) {
+          usersMap.set(request.fromUserId, { ...userSnap.data(), id: userSnap.id } as User);
+        }
+      }
+      setFriendRequestUsers(usersMap);
     });
 
     return unsubscribe;
@@ -325,36 +337,41 @@ export function FriendsSidebar({
           {/* Notifications */}
           <TabsContent value="notifications" className="flex-1 overflow-y-auto p-2 space-y-2 mt-0">
             {/* Friend Requests */}
-            {friendRequests.map(request => (
-              <div 
-                key={request.id} 
-                className="p-3 rounded-lg bg-secondary/50 border border-border space-y-2"
-                data-testid={`friend-request-${request.id}`}
-              >
-                <p className="text-sm text-foreground">
-                  Friend request from <span className="font-semibold">{request.fromUserId}</span>
-                </p>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    onClick={() => onAcceptFriendRequest(request.id)}
-                    data-testid={`button-accept-${request.id}`}
-                  >
-                    <Check className="h-4 w-4 mr-1" />
-                    Accept
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => onDeclineFriendRequest(request.id)}
-                    data-testid={`button-decline-${request.id}`}
-                  >
-                    <XCircle className="h-4 w-4 mr-1" />
-                    Decline
-                  </Button>
+            {friendRequests.map(request => {
+              const fromUser = friendRequestUsers.get(request.fromUserId);
+              const displayName = fromUser?.displayName || 'Someone';
+              
+              return (
+                <div 
+                  key={request.id} 
+                  className="p-3 rounded-lg bg-secondary/50 border border-border space-y-2"
+                  data-testid={`friend-request-${request.id}`}
+                >
+                  <p className="text-sm text-foreground">
+                    <span className="font-semibold">{displayName}</span> sent you a friend request
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      onClick={() => onAcceptFriendRequest(request.id)}
+                      data-testid={`button-accept-${request.id}`}
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Accept
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => onDeclineFriendRequest(request.id)}
+                      data-testid={`button-decline-${request.id}`}
+                    >
+                      <XCircle className="h-4 w-4 mr-1" />
+                      Decline
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {/* Other Notifications */}
             {notifications.map(notif => (
