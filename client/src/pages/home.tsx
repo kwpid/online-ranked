@@ -137,6 +137,29 @@ export default function HomePage() {
     if (!currentUser) return;
 
     try {
+      // Get friend's data to check settings
+      const friendDoc = await getDoc(doc(db, 'users', friendId));
+      if (!friendDoc.exists()) {
+        toast({
+          title: 'Error',
+          description: 'User not found',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const friendData = { ...friendDoc.data(), id: friendDoc.id } as User;
+
+      // Check if friend allows party invites
+      if (friendData.settings?.allowPartyInvites === false) {
+        toast({
+          title: 'Cannot Send Invite',
+          description: 'This user is not accepting party invites',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Check if friend is already in YOUR party
       if (currentParty && currentParty.memberIds.includes(friendId)) {
         toast({
