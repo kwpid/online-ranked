@@ -243,6 +243,16 @@ export default function HomePage() {
         return;
       }
 
+      // Check if target user allows friend requests
+      if (targetUser.settings?.allowFriendRequests === false) {
+        toast({
+          title: 'Cannot Send Request',
+          description: 'This user is not accepting friend requests',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Check if already friends
       const friendshipsQuery = query(
         collection(db, 'friendships'),
