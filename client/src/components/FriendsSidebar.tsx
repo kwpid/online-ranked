@@ -290,7 +290,7 @@ export function FriendsSidebar({
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground truncate">{member.displayName}</p>
                     <p className="text-xs text-muted-foreground truncate max-w-[180px]">
-                      {member.currentActivity || 'Offline'}
+                      {member.status === 'online' ? (member.currentActivity || 'In Menu') : 'Offline'}
                     </p>
                   </div>
                 </div>
@@ -336,6 +336,35 @@ export function FriendsSidebar({
 
           {/* Notifications */}
           <TabsContent value="notifications" className="flex-1 overflow-y-auto p-2 space-y-2 mt-0">
+            {/* Mark All as Read button */}
+            {(notifications.length > 0 || friendRequests.length > 0) && (
+              <div className="sticky top-0 bg-card/95 backdrop-blur-sm p-2 border-b border-border z-10">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full text-foreground"
+                  onClick={async () => {
+                    try {
+                      for (const notif of notifications) {
+                        await handleMarkNotificationRead(notif.id);
+                      }
+                      toast({
+                        title: 'Notifications Cleared',
+                        description: 'All notifications marked as read',
+                      });
+                    } catch (error) {
+                      toast({
+                        title: 'Error',
+                        description: 'Failed to mark all as read',
+                        variant: 'destructive',
+                      });
+                    }
+                  }}
+                >
+                  Mark All as Read
+                </Button>
+              </div>
+            )}
             {/* Friend Requests */}
             {friendRequests.map(request => {
               const fromUser = friendRequestUsers.get(request.fromUserId);
@@ -411,7 +440,7 @@ export function FriendsSidebar({
                   <Button 
                     size="sm" 
                     variant="ghost"
-                    className="mt-2"
+                    className="mt-2 text-foreground hover:text-foreground"
                     onClick={() => handleMarkNotificationRead(notif.id)}
                   >
                     Mark as Read
@@ -504,7 +533,7 @@ function FriendItem({
           <div className="flex-1 min-w-0">
             <p className="font-medium text-foreground truncate">{friend.displayName}</p>
             <p className="text-xs text-muted-foreground truncate max-w-[180px]">
-              {friend.currentActivity || 'Offline'}
+              {friend.status === 'online' ? (friend.currentActivity || 'In Menu') : 'Offline'}
             </p>
           </div>
         </div>
