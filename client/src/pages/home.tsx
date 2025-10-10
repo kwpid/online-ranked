@@ -132,7 +132,17 @@ export default function HomePage() {
     if (!currentUser) return;
 
     try {
-      // Check if friend is already in a party
+      // Check if friend is already in YOUR party
+      if (currentParty && currentParty.memberIds.includes(friendId)) {
+        toast({
+          title: 'Already in Party',
+          description: 'This friend is already in your party',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Check if friend is already in a different party
       const friendPartiesQuery = query(
         collection(db, 'parties'),
         where('memberIds', 'array-contains', friendId)
@@ -142,7 +152,7 @@ export default function HomePage() {
       if (!friendPartySnap.empty) {
         toast({
           title: 'Cannot Invite',
-          description: 'This friend is already in a party',
+          description: 'This friend is already in another party',
           variant: 'destructive',
         });
         return;
@@ -187,10 +197,11 @@ export default function HomePage() {
         title: 'Invitation Sent',
         description: 'Party invitation sent successfully',
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Party invitation error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to send party invitation',
+        description: error.message || 'Failed to send party invitation',
         variant: 'destructive',
       });
     }
