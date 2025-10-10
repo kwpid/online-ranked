@@ -84,8 +84,16 @@ export default {
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
+        display: ["Rajdhani", "var(--font-sans)"],
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],
+      },
+      letterSpacing: {
+        wide: '0.025em',
+        wider: '0.05em',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
       keyframes: {
         "accordion-down": {
