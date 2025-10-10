@@ -57,9 +57,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl bg-card border-border">
+      <DialogContent className="sm:max-w-2xl bg-card text-card-foreground border-border">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Edit Profile</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-foreground">Edit Profile</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4">

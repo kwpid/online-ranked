@@ -509,14 +509,14 @@ function FriendItem({
           </div>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={() => onInviteToParty(friend.id)} data-testid={`button-invite-${friend.id}`}>
+      <DropdownMenuContent align="end" className="w-48 bg-popover text-popover-foreground border-border">
+        <DropdownMenuItem onClick={() => onInviteToParty(friend.id)} data-testid={`button-invite-${friend.id}`} className="text-foreground">
           <UserPlus className="h-4 w-4 mr-2" />
           Invite to Party
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => onRemoveFriend(friend.id)}
-          className="text-destructive"
+          className="text-destructive focus:text-destructive"
           data-testid={`button-remove-friend-${friend.id}`}
         >
           <UserMinus className="h-4 w-4 mr-2" />

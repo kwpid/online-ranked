@@ -114,10 +114,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl bg-card border-border">
+    <Dialog open={isOpen} onOpenChange=
+
+{onClose}>
+      <DialogContent className="sm:max-w-2xl bg-card text-card-foreground border-border">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Settings</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-foreground">Settings</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
