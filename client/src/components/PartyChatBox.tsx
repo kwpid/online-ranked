@@ -6,15 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, MessageSquare, X } from 'lucide-react';
 import { collection, addDoc, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-
-interface PartyMessage {
-  id: string;
-  partyId: string;
-  userId: string;
-  displayName: string;
-  message: string;
-  createdAt: number;
-}
+import { PartyMessage } from '@shared/schema';
 
 interface PartyChatBoxProps {
   partyId: string;

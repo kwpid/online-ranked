@@ -112,3 +112,22 @@ export const recentlyPlayedSchema = z.object({
 });
 
 export type RecentlyPlayed = z.infer<typeof recentlyPlayedSchema>;
+
+// Party Message Schema
+export const partyMessageSchema = z.object({
+  id: z.string(),
+  partyId: z.string(),
+  userId: z.string(),
+  displayName: z.string(),
+  message: z.string(),
+  createdAt: z.number(),
+});
+
+export type PartyMessage = z.infer<typeof partyMessageSchema>;
+
+export const insertPartyMessageSchema = partyMessageSchema.omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPartyMessage = z.infer<typeof insertPartyMessageSchema>;
