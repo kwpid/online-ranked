@@ -40,9 +40,13 @@ export const partyService = {
     const party = partySnap.data();
     const newMemberIds = party.memberIds.filter((id: string) => id !== userId);
     
-    // If no members left, delete party
+    // If no members left, delete party and cleanup messages
     if (newMemberIds.length === 0) {
       await deleteDoc(partyRef);
+      
+      // Cleanup party messages
+      const { cleanupService } = await import('./firebaseService');
+      await cleanupService.deletePartyMessages(partyId);
       return;
     }
     
@@ -278,5 +282,65 @@ export const notificationService = {
     await updateDoc(notifRef, { read: true });
 
     return notification.partyId;
+  },
+
+  // Cleanup old read notifications (older than 7 days)
+  async cleanupOldNotifications(userId: string) {
+    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const notificationsQuery = query(
+      collection(db, 'notifications'),
+      where('userId', '==', userId),
+      where('read', '==', true),
+      where('createdAt', '<', sevenDaysAgo)
+    );
+    
+    const snapshot = await getDocs(notificationsQuery);
+    snapshot.forEach(doc => deleteDoc(doc.ref));
+  },
+};
+
+// Cleanup Operations
+export const cleanupService = {
+  // Delete party messages when party is deleted
+  async deletePartyMessages(partyId: string) {
+    const messagesQuery = query(
+      collection(db, 'partyMessages'),
+      where('partyId', '==', partyId)
+    );
+    const snapshot = await getDocs(messagesQuery);
+    snapshot.forEach(doc => deleteDoc(doc.ref));
+  },
+
+  // Cleanup old accepted/declined friend requests (older than 7 days)
+  async cleanupOldFriendRequests(userId: string) {
+    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    
+    // Clean sent requests
+    const sentQuery = query(
+      collection(db, 'friendRequests'),
+      where('fromUserId', '==', userId),
+      where('createdAt', '<', sevenDaysAgo)
+    );
+    const sentSnapshot = await getDocs(sentQuery);
+    sentSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.status !== 'pending') {
+        deleteDoc(doc.ref);
+      }
+    });
+
+    // Clean received requests
+    const receivedQuery = query(
+      collection(db, 'friendRequests'),
+      where('toUserId', '==', userId),
+      where('createdAt', '<', sevenDaysAgo)
+    );
+    const receivedSnapshot = await getDocs(receivedQuery);
+    receivedSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.status !== 'pending') {
+        deleteDoc(doc.ref);
+      }
+    });
   },
 };

@@ -8,6 +8,7 @@ import {
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from '@/lib/firebase';
 import { User, InsertUser } from '@shared/schema';
+import { notificationService, cleanupService } from '@/lib/firebaseService';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -83,6 +84,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const userProfile = await createOrGetUserProfile(firebaseUser);
           setCurrentUser(userProfile);
+          
+          // Run cleanup tasks in background (don't await)
+          notificationService.cleanupOldNotifications(firebaseUser.uid).catch(console.error);
+          cleanupService.cleanupOldFriendRequests(firebaseUser.uid).catch(console.error);
         } catch (error) {
           console.error('Error loading user profile:', error);
           setCurrentUser(null);
