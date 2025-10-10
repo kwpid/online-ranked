@@ -461,6 +461,35 @@ export const notificationService = {
     await updateDoc(notifRef, { read: true });
   },
 
+  async sendPartyJoinRequest(friendId: string, currentUserId: string, currentUserDisplayName: string, currentUserPhotoURL: string | null) {
+    // Find the party the friend is in
+    const partiesQuery = query(
+      collection(db, 'parties'),
+      where('memberIds', 'array-contains', friendId)
+    );
+    const partySnap = await getDocs(partiesQuery);
+    
+    if (partySnap.empty) {
+      throw new Error('Friend is not in a party');
+    }
+
+    const party = partySnap.docs[0];
+    const partyData = party.data();
+    const partyId = party.id;
+    const leaderId = partyData.leaderId;
+
+    // Send notification to party leader
+    await this.create({
+      userId: leaderId,
+      type: 'party_join_request',
+      fromUserId: currentUserId,
+      fromUserDisplayName: currentUserDisplayName,
+      fromUserPhotoURL: currentUserPhotoURL,
+      partyId: partyId,
+      message: `${currentUserDisplayName} wants to join your party`,
+    });
+  },
+
   // Cleanup old read notifications (older than 7 days)
   async cleanupOldNotifications(userId: string) {
     const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);

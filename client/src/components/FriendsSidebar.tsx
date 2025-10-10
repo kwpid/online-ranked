@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { X, UserPlus, UserMinus, Send, Check, XCircle, Users as UsersIcon } from 'lucide-react';
+import { X, UserPlus, UserMinus, Send, Check, XCircle, Users as UsersIcon, DoorOpen } from 'lucide-react';
 import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { notificationService } from '@/lib/firebaseService';
@@ -39,7 +39,7 @@ export function FriendsSidebar({
 }: FriendsSidebarProps) {
   const { currentUser } = useAuth();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('online');
+  const [activeTab, setActiveTab] = useState('friends');
   const [searchUsername, setSearchUsername] = useState('');
   const [friends, setFriends] = useState<User[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -48,6 +48,7 @@ export function FriendsSidebar({
   const [recentlyPlayed, setRecentlyPlayed] = useState<User[]>([]);
   const [partyMembers, setPartyMembers] = useState<User[]>([]);
   const [isInParty, setIsInParty] = useState(false);
+  const [usersInParty, setUsersInParty] = useState<Set<string>>(new Set());
 
   // Real-time friends listener with real-time status updates
   useEffect(() => {
@@ -196,6 +197,26 @@ export function FriendsSidebar({
     };
   }, [currentUser]);
 
+  // Track all users in parties
+  useEffect(() => {
+    const partiesQuery = query(collection(db, 'parties'));
+    
+    const unsubscribe = onSnapshot(partiesQuery, (snapshot) => {
+      const allUserIds = new Set<string>();
+      
+      snapshot.docs.forEach(doc => {
+        const party = doc.data();
+        if (party.memberIds && Array.isArray(party.memberIds)) {
+          party.memberIds.forEach((id: string) => allUserIds.add(id));
+        }
+      });
+      
+      setUsersInParty(allUserIds);
+    });
+
+    return unsubscribe;
+  }, []);
+
   const onlineFriends = friends.filter(f => f.status === 'online');
   const unreadCount = notifications.length + friendRequests.length;
 
@@ -235,6 +256,30 @@ export function FriendsSidebar({
       toast({
         title: 'Error',
         description: 'Failed to decline invitation',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleRequestToJoinParty = async (friendId: string) => {
+    if (!currentUser) return;
+    
+    try {
+      await notificationService.sendPartyJoinRequest(
+        friendId, 
+        currentUser.id, 
+        currentUser.displayName,
+        currentUser.photoURL
+      );
+      
+      toast({
+        title: 'Request Sent',
+        description: 'Your request to join the party has been sent to the party leader',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to send party join request',
         variant: 'destructive',
       });
     }
@@ -280,18 +325,11 @@ export function FriendsSidebar({
               </TabsTrigger>
             )}
             <TabsTrigger 
-              value="online" 
+              value="friends" 
               className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary touch-manipulation whitespace-nowrap" 
-              data-testid="tab-online-friends"
+              data-testid="tab-friends"
             >
-              Online ({onlineFriends.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="all" 
-              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary touch-manipulation whitespace-nowrap" 
-              data-testid="tab-all-friends"
-            >
-              All ({friends.length})
+              Friends ({friends.length})
             </TabsTrigger>
             <TabsTrigger 
               value="notifications" 
@@ -355,39 +393,52 @@ export function FriendsSidebar({
             </TabsContent>
           )}
 
-          {/* Online Friends */}
-          <TabsContent value="online" className="flex-1 overflow-y-auto p-2 space-y-2 mt-0">
-            {onlineFriends.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No friends online
-              </div>
-            ) : (
-              onlineFriends.map(friend => (
-                <FriendItem
-                  key={friend.id}
-                  friend={friend}
-                  onInviteToParty={onInviteToParty}
-                  onRemoveFriend={onRemoveFriend}
-                />
-              ))
-            )}
-          </TabsContent>
-
-          {/* All Friends */}
-          <TabsContent value="all" className="flex-1 overflow-y-auto p-2 space-y-2 mt-0">
+          {/* Friends (Combined Online and Offline) */}
+          <TabsContent value="friends" className="flex-1 overflow-y-auto p-2 space-y-2 mt-0">
             {friends.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No friends yet
               </div>
             ) : (
-              friends.map(friend => (
-                <FriendItem
-                  key={friend.id}
-                  friend={friend}
-                  onInviteToParty={onInviteToParty}
-                  onRemoveFriend={onRemoveFriend}
-                />
-              ))
+              <>
+                {/* Online Section */}
+                {onlineFriends.length > 0 && (
+                  <>
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground border-b border-border/50">
+                      ---- ONLINE
+                    </div>
+                    {onlineFriends.map(friend => (
+                      <FriendItem
+                        key={friend.id}
+                        friend={friend}
+                        isInParty={usersInParty.has(friend.id)}
+                        onInviteToParty={onInviteToParty}
+                        onRemoveFriend={onRemoveFriend}
+                        onRequestToJoinParty={handleRequestToJoinParty}
+                      />
+                    ))}
+                  </>
+                )}
+
+                {/* Offline Section */}
+                {friends.filter(f => f.status !== 'online').length > 0 && (
+                  <>
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground border-b border-border/50 mt-2">
+                      ----- OFFLINE
+                    </div>
+                    {friends.filter(f => f.status !== 'online').map(friend => (
+                      <FriendItem
+                        key={friend.id}
+                        friend={friend}
+                        isInParty={usersInParty.has(friend.id)}
+                        onInviteToParty={onInviteToParty}
+                        onRemoveFriend={onRemoveFriend}
+                        onRequestToJoinParty={handleRequestToJoinParty}
+                      />
+                    ))}
+                  </>
+                )}
+              </>
             )}
           </TabsContent>
 
@@ -562,12 +613,16 @@ export function FriendsSidebar({
 
 function FriendItem({ 
   friend, 
+  isInParty = false,
   onInviteToParty, 
-  onRemoveFriend 
+  onRemoveFriend,
+  onRequestToJoinParty
 }: { 
   friend: User;
+  isInParty?: boolean;
   onInviteToParty: (userId: string) => void;
   onRemoveFriend: (userId: string) => void;
+  onRequestToJoinParty: (userId: string) => void;
 }) {
   return (
     <DropdownMenu>
@@ -593,7 +648,9 @@ function FriendItem({
               <AdminBadge isAdmin={friend.isAdmin} />
             </div>
             <p className="text-xs text-muted-foreground truncate max-w-[180px]">
-              {friend.status === 'online' ? (friend.currentActivity || 'In Menu') : 'Offline'}
+              {friend.status === 'online' 
+                ? `${friend.currentActivity || 'In Menu'}${isInParty ? ' (In Party)' : ''}` 
+                : 'Offline'}
             </p>
           </div>
         </div>
@@ -603,6 +660,12 @@ function FriendItem({
           <UserPlus className="h-4 w-4 mr-2" />
           Invite to Party
         </DropdownMenuItem>
+        {isInParty && (
+          <DropdownMenuItem onClick={() => onRequestToJoinParty(friend.id)} data-testid={`button-request-join-${friend.id}`} className="text-foreground">
+            <DoorOpen className="h-4 w-4 mr-2" />
+            Request To Join Party
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem 
           onClick={() => onRemoveFriend(friend.id)}
           className="text-destructive focus:text-destructive"

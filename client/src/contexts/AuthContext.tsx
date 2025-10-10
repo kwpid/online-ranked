@@ -65,18 +65,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (userSnap.exists()) {
       const userData = userSnap.data() as User;
+      const now = Date.now();
       // Update status to online
       await updateDoc(userRef, { 
         status: 'online',
-        currentActivity: 'In Menu'
+        currentActivity: 'In Menu',
+        lastActive: now
       });
-      return { ...userData, status: 'online', currentActivity: 'In Menu' };
+      return { ...userData, status: 'online', currentActivity: 'In Menu', lastActive: now };
     }
 
     // Create new user profile with unique username
     const baseUsername = generateUsername(firebaseUser.email || '');
     const uniqueUsername = await ensureUniqueUsername(baseUsername);
     
+    const now = Date.now();
     const newUser: User = {
       id: firebaseUser.uid,
       email: firebaseUser.email || '',
@@ -88,8 +91,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       banner: null,
       status: 'online',
       currentActivity: 'In Menu',
+      lastActive: now,
       isAdmin: false,
-      createdAt: Date.now(),
+      settings: {
+        allowFriendRequests: true,
+        allowPartyInvites: true,
+        appearanceStatus: 'online',
+      },
+      createdAt: now,
     };
 
     await setDoc(userRef, newUser);
@@ -120,11 +129,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  // Handle tab close and periodic activity updates
+  // Handle tab close and activity tracking with inactivity timeout
   useEffect(() => {
     if (!currentUser) return;
 
     const userId = currentUser.id;
+    const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+    let lastActivityTime = Date.now();
 
     // Handle tab/window close - set status to offline
     // Using pagehide event which is more reliable than beforeunload
@@ -139,21 +150,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     };
 
-    // Set initial status to online
+    // Set initial status to online with current timestamp
     const userRef = doc(db, 'users', userId);
     updateDoc(userRef, { 
       status: 'online',
-      currentActivity: 'In Menu'
+      currentActivity: 'In Menu',
+      lastActive: Date.now()
     });
 
-    // Periodic activity update (every 30 seconds) - keeps user online regardless of tab visibility
+    // Track user activity
+    const updateActivity = () => {
+      lastActivityTime = Date.now();
+    };
+
+    // Activity listeners
+    window.addEventListener('mousemove', updateActivity);
+    window.addEventListener('keydown', updateActivity);
+    window.addEventListener('click', updateActivity);
+    window.addEventListener('scroll', updateActivity);
+
+    // Periodic check for inactivity and update lastActive
     const activityInterval = setInterval(async () => {
+      const currentTime = Date.now();
+      const timeSinceLastActivity = currentTime - lastActivityTime;
       const userRef = doc(db, 'users', userId);
-      await updateDoc(userRef, { 
-        status: 'online',
-        currentActivity: 'In Menu'
-      });
-    }, 30000); // 30 seconds
+
+      if (timeSinceLastActivity >= INACTIVITY_TIMEOUT) {
+        // User is inactive for 5+ minutes, set to offline
+        await updateDoc(userRef, { 
+          status: 'offline',
+          lastActive: lastActivityTime
+        });
+      } else {
+        // User is active, update lastActive and keep online
+        await updateDoc(userRef, { 
+          status: 'online',
+          currentActivity: 'In Menu',
+          lastActive: currentTime
+        });
+      }
+    }, 30000); // Check every 30 seconds
 
     // Listen for tab/window close - use both events for better coverage
     window.addEventListener('pagehide', handlePageHide);
@@ -162,6 +198,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       window.removeEventListener('pagehide', handlePageHide);
       window.removeEventListener('beforeunload', handlePageHide);
+      window.removeEventListener('mousemove', updateActivity);
+      window.removeEventListener('keydown', updateActivity);
+      window.removeEventListener('click', updateActivity);
+      window.removeEventListener('scroll', updateActivity);
       clearInterval(activityInterval);
     };
   }, [currentUser?.id]);
