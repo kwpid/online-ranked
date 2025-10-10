@@ -28,7 +28,7 @@ import {
   arrayRemove,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { User, Party } from '@shared/schema';
+import { User, Party, FriendRequest } from '@shared/schema';
 
 export default function HomePage() {
   const { currentUser, signOut } = useAuth();
@@ -96,15 +96,23 @@ export default function HomePage() {
       where('status', '==', 'pending')
     );
 
+    let notifCount = 0;
+    let requestCount = 0;
+
     const unsubNotifs = onSnapshot(notificationsQuery, (snapshot) => {
-      const notifCount = snapshot.size;
-      
-      onSnapshot(friendRequestsQuery, (reqSnapshot) => {
-        setUnreadNotifications(notifCount + reqSnapshot.size);
-      });
+      notifCount = snapshot.size;
+      setUnreadNotifications(notifCount + requestCount);
     });
 
-    return unsubNotifs;
+    const unsubRequests = onSnapshot(friendRequestsQuery, (snapshot) => {
+      requestCount = snapshot.size;
+      setUnreadNotifications(notifCount + requestCount);
+    });
+
+    return () => {
+      unsubNotifs();
+      unsubRequests();
+    };
   }, [currentUser]);
 
   const handleSignOut = async () => {
@@ -318,7 +326,7 @@ export default function HomePage() {
       
       if (!requestSnap.exists()) return;
 
-      const request = { ...requestSnap.data(), id: requestSnap.id };
+      const request = { ...requestSnap.data(), id: requestSnap.id } as FriendRequest;
 
       // Create bidirectional friendships
       await addDoc(collection(db, 'friendships'), {
