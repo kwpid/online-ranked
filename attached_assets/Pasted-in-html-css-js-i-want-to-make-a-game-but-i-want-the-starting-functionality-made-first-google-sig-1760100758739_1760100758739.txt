@@ -1,0 +1,73 @@
+in html/css/js i want to make a game, but i want the starting functionality made first:
+- google signup/login system
+using firebase SDK, all data will be saved into the Firestore DB, and users can aces the site through their google account
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAig5NZUSZQBpvc3mQk4TfuCOfVr2DfaUE",
+    authDomain: "pokeronlinev2.firebaseapp.com",
+    projectId: "pokeronlinev2",
+    storageBucket: "pokeronlinev2.firebasestorage.app",
+    messagingSenderId: "550772836623",
+    appId: "1:550772836623:web:96ebcf43ade04b9aa8967a",
+    measurementId: "G-Z8HC47ZFGM"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+all databases should be created dynamically, when the first user signsup, all needed databases should be created dynamically for the first time
+
+when a user signs up, the game will use their google username (their email just without @gmail.com) as the players actual username
+however; they can change this username once a week, they can change it right away if they dont wnat theyre actual email tied to their account
+
+menu:
+when a player finally signs in / logins in, the menu is shown, the site will be a dark modern simplistic thtme
+all game buttons will be on the left bottomish, liek the rocket league Ui.
+in the middle / emtpy space of the page is the players party (or just the player if no party), where it shows players pFP (google pfp or ciustom pfp) and display name underneath
+when the player is in a party, then all party members will show here as well, with the local players stuff being a bit bigger
+
+
+buttons:
+Play
+Item Shop
+Inventory
+Season Pass
+Profile
+Settings
+
+play, item, inventory, season pass wont work for now (disable these)
+Profile will work it will bring a popup where user can:
+- change display name, pfp
+and they can later:
+- change title and banner
+
+Settings
+- change actual username, and friend / party settings
+
+party:
+- bottom right is a friends icon, clicking it brings a side popup, showing Online friends 
+[pfp] [displayName]
+      [in-game activity]
+6 tabs:
+Party (if in party), Online Friends, All Friends, Notifications, Recently Played With, Add Freind (brings a popup to add a username, when enterd, checks if user exist, if not return "User Does Not Exist", if found, send that specified user a notification that this user wants to friend them)
+
+clicking on a player brings a dropdown:
+Invite to Party
+Add Friend (if not friend)
+Remove Friend (if friend)
+
+when a player invites someone to a party, that user gets the notification to join or ignore the invite
+joining the party updates party ui, and the one who started the party is the party leader (can kick/promote users)
+
+this is the bare minium, all of this must be complete, with fully working friend / party system
