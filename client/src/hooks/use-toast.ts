@@ -7,12 +7,14 @@ import type {
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 5000
+const TOAST_AUTO_DISMISS_DURATION = 4000
 
 type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  duration?: number
 }
 
 const actionTypes = {
@@ -155,6 +157,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
+      duration: props.duration ?? TOAST_AUTO_DISMISS_DURATION,
       onOpenChange: (open) => {
         if (!open) dismiss()
       },
