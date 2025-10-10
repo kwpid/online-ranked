@@ -17,6 +17,7 @@ import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'fi
 import { db } from '@/lib/firebase';
 import { notificationService } from '@/lib/firebaseService';
 import { AdminBadge } from './AdminBadge';
+import { getDisplayStatus, getStatusColor, getStatusText } from '@/lib/statusUtils';
 
 interface FriendsSidebarProps {
   isOpen: boolean;
@@ -217,7 +218,7 @@ export function FriendsSidebar({
     return unsubscribe;
   }, []);
 
-  const onlineFriends = friends.filter(f => f.status === 'online');
+  const onlineFriends = friends.filter(f => getDisplayStatus(f) === 'online');
   const unreadCount = notifications.length + friendRequests.length;
 
   const handleMarkNotificationRead = async (notificationId: string) => {
@@ -376,7 +377,7 @@ export function FriendsSidebar({
                       </AvatarFallback>
                     </Avatar>
                     <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-card ${
-                      member.status === 'online' ? 'bg-status-online' : 'bg-status-offline'
+                      getStatusColor(getDisplayStatus(member))
                     }`} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -385,7 +386,7 @@ export function FriendsSidebar({
                       <AdminBadge isAdmin={member.isAdmin} />
                     </div>
                     <p className="text-xs text-muted-foreground truncate max-w-[180px]">
-                      {member.status === 'online' ? (member.currentActivity || 'In Menu') : 'Offline'}
+                      {getStatusText(getDisplayStatus(member), member.currentActivity)}
                     </p>
                   </div>
                 </div>
@@ -421,12 +422,12 @@ export function FriendsSidebar({
                 )}
 
                 {/* Offline Section */}
-                {friends.filter(f => f.status !== 'online').length > 0 && (
+                {friends.filter(f => getDisplayStatus(f) !== 'online').length > 0 && (
                   <>
                     <div className="px-2 py-1 text-xs font-semibold text-muted-foreground border-b border-border/50 mt-2">
-                      ----- OFFLINE
+                      ----- OFFLINE / DND
                     </div>
-                    {friends.filter(f => f.status !== 'online').map(friend => (
+                    {friends.filter(f => getDisplayStatus(f) !== 'online').map(friend => (
                       <FriendItem
                         key={friend.id}
                         friend={friend}
@@ -639,7 +640,7 @@ function FriendItem({
               </AvatarFallback>
             </Avatar>
             <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-card ${
-              friend.status === 'online' ? 'bg-status-online' : 'bg-status-offline'
+              getStatusColor(getDisplayStatus(friend))
             }`} />
           </div>
           <div className="flex-1 min-w-0">
@@ -648,9 +649,9 @@ function FriendItem({
               <AdminBadge isAdmin={friend.isAdmin} />
             </div>
             <p className="text-xs text-muted-foreground truncate max-w-[180px]">
-              {friend.status === 'online' 
+              {getDisplayStatus(friend) === 'online' 
                 ? `${friend.currentActivity || 'In Menu'}${isInParty ? ' (In Party)' : ''}` 
-                : 'Offline'}
+                : getStatusText(getDisplayStatus(friend))}
             </p>
           </div>
         </div>

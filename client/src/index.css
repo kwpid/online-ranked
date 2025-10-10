@@ -257,6 +257,10 @@
   .bg-status-offline {
     @apply bg-gray-500;
   }
+  
+  .bg-status-dnd {
+    @apply bg-red-500;
+  }
 }
 
 /**
