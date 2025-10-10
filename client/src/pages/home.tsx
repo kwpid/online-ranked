@@ -7,6 +7,7 @@ import { FriendsSidebar } from '@/components/FriendsSidebar';
 import { ProfileModal } from '@/components/ProfileModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { PartyChatBox } from '@/components/PartyChatBox';
+import AdminPanelDialog from '@/components/AdminPanelDialog';
 import { useToast } from '@/hooks/use-toast';
 import { partyService } from '@/lib/firebaseService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,6 +42,7 @@ export default function HomePage() {
   const [friendsSidebarOpen, setFriendsSidebarOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [adminPanelOpen, setAdminPanelOpen] = useState(false);
   
   const [currentParty, setCurrentParty] = useState<Party | null>(null);
   const [partyMembers, setPartyMembers] = useState<User[]>([]);
@@ -607,7 +609,7 @@ export default function HomePage() {
         </Button>
         {currentUser.isAdmin && (
           <Button
-            onClick={() => setLocation('/admin')}
+            onClick={() => setAdminPanelOpen(true)}
             className="font-display text-lg font-bold uppercase tracking-wider px-8 py-6 bg-red-500/20 backdrop-blur-sm border-2 border-red-500/50 hover:border-red-500 hover:scale-105 transition-all duration-200"
             data-testid="button-admin-panel"
           >
@@ -708,6 +710,11 @@ export default function HomePage() {
       <SettingsModal
         isOpen={settingsModalOpen}
         onClose={() => setSettingsModalOpen(false)}
+      />
+
+      <AdminPanelDialog
+        open={adminPanelOpen}
+        onOpenChange={setAdminPanelOpen}
       />
 
       {/* Party Chat - Only show when in a party */}

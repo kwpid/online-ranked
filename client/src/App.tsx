@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import AuthPage from "@/pages/auth";
 import HomePage from "@/pages/home";
-import AdminPanel from "@/pages/admin";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element | null }): JSX.Element {
   const { currentUser, loading } = useAuth();
@@ -32,9 +31,6 @@ function Router() {
   return (
     <Switch>
       <Route path="/auth" component={AuthPage} />
-      <Route path="/admin">
-        <ProtectedRoute component={AdminPanel} />
-      </Route>
       <Route path="/">
         <ProtectedRoute component={HomePage} />
       </Route>
