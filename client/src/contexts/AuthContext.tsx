@@ -2,8 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { 
   User as FirebaseUser, 
   onAuthStateChanged, 
-  signInWithRedirect, 
-  getRedirectResult,
+  signInWithPopup,
   signOut as firebaseSignOut
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
@@ -74,22 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return newUser;
   };
 
-  // Handle redirect result
-  useEffect(() => {
-    const handleRedirect = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result?.user) {
-          const userProfile = await createOrGetUserProfile(result.user);
-          setCurrentUser(userProfile);
-        }
-      } catch (error) {
-        console.error('Error handling redirect:', error);
-      }
-    };
-    
-    handleRedirect();
-  }, []);
 
   // Listen to auth state changes
   useEffect(() => {
@@ -116,7 +99,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithRedirect(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result?.user) {
+        const userProfile = await createOrGetUserProfile(result.user);
+        setCurrentUser(userProfile);
+      }
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;
