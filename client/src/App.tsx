@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import AuthPage from "@/pages/auth";
 import HomePage from "@/pages/home";
 
-function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
+function ProtectedRoute({ component: Component }: { component: () => JSX.Element | null }): JSX.Element {
   const { currentUser, loading } = useAuth();
   
   if (loading) {
