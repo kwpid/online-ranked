@@ -33,10 +33,10 @@ export default function AuthPage() {
         {/* Logo/Title */}
         <div className="text-center">
           <h1 className="font-display text-6xl font-bold text-foreground uppercase tracking-wider mb-2">
-            Gaming Platform
+            Ranked Poker
           </h1>
           <p className="text-muted-foreground text-lg">
-            Connect. Party Up. Dominate.
+            Play Smart. Rise Fast. Own the Table.
           </p>
         </div>
 
