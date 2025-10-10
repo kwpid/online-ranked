@@ -175,6 +175,58 @@ export const partyService = {
     // Send system message
     await sendPartySystemMessage(partyId, newLeaderDisplayName, 'promote');
   },
+
+  async requestToJoin(partyId: string, userId: string, userDisplayName: string, userPhotoURL: string | null) {
+    // Get party to find the leader
+    const partyRef = doc(db, 'parties', partyId);
+    const partySnap = await getDoc(partyRef);
+    
+    if (!partySnap.exists()) {
+      throw new Error('Party no longer exists');
+    }
+    
+    const party = partySnap.data();
+    
+    // Check if user is already in the party
+    if (party.memberIds.includes(userId)) {
+      throw new Error('Already in this party');
+    }
+    
+    // Send notification to party leader
+    await addDoc(collection(db, 'notifications'), {
+      userId: party.leaderId,
+      type: 'party_join_request',
+      fromUserId: userId,
+      fromUserDisplayName: userDisplayName,
+      fromUserPhotoURL: userPhotoURL,
+      partyId,
+      message: `${userDisplayName} wants to join your party`,
+      read: false,
+      createdAt: Date.now(),
+    });
+  },
+
+  async adminJoin(partyId: string, userId: string, userDisplayName: string) {
+    // Admin can join any party without invitation
+    const partyRef = doc(db, 'parties', partyId);
+    await updateDoc(partyRef, {
+      memberIds: arrayUnion(userId),
+    });
+    
+    // Send system message
+    await sendPartySystemMessage(partyId, `${userDisplayName} (Admin)`, 'join');
+  },
+
+  async adminPromoteSelf(partyId: string, userId: string, userDisplayName: string) {
+    // Admin can promote themselves to leader
+    const partyRef = doc(db, 'parties', partyId);
+    await updateDoc(partyRef, {
+      leaderId: userId,
+    });
+    
+    // Send system message
+    await sendPartySystemMessage(partyId, `${userDisplayName} (Admin)`, 'promote');
+  },
 };
 
 // Friend Operations
@@ -355,6 +407,58 @@ export const notificationService = {
     await updateDoc(notifRef, { read: true });
 
     return notification.partyId;
+  },
+
+  async acceptPartyJoinRequest(notificationId: string, requesterId: string) {
+    const notifRef = doc(db, 'notifications', notificationId);
+    const notifSnap = await getDoc(notifRef);
+    
+    if (!notifSnap.exists()) {
+      throw new Error('Notification not found');
+    }
+
+    const notification = notifSnap.data();
+    
+    if (!notification.partyId || !notification.fromUserId) {
+      throw new Error('Invalid party join request');
+    }
+
+    // Check if party still exists
+    const partyRef = doc(db, 'parties', notification.partyId);
+    const partySnap = await getDoc(partyRef);
+    
+    if (!partySnap.exists()) {
+      throw new Error('Party no longer exists');
+    }
+
+    // Check if requester is already in a party
+    const requesterPartiesQuery = query(
+      collection(db, 'parties'),
+      where('memberIds', 'array-contains', notification.fromUserId)
+    );
+    const requesterPartySnap = await getDocs(requesterPartiesQuery);
+    
+    if (!requesterPartySnap.empty) {
+      throw new Error('User is already in a party');
+    }
+
+    // Get requester's display name
+    const requesterRef = doc(db, 'users', notification.fromUserId);
+    const requesterSnap = await getDoc(requesterRef);
+    const requesterDisplayName = requesterSnap.exists() ? requesterSnap.data().displayName : 'Unknown';
+    
+    // Add requester to the party
+    await partyService.join(notification.partyId, notification.fromUserId, requesterDisplayName);
+    
+    // Mark notification as read
+    await updateDoc(notifRef, { read: true });
+
+    return notification.partyId;
+  },
+
+  async declinePartyJoinRequest(notificationId: string) {
+    const notifRef = doc(db, 'notifications', notificationId);
+    await updateDoc(notifRef, { read: true });
   },
 
   // Cleanup old read notifications (older than 7 days)

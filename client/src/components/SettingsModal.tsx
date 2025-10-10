@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -20,6 +22,20 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { toast } = useToast();
   const [newUsername, setNewUsername] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Settings state
+  const [allowFriendRequests, setAllowFriendRequests] = useState(true);
+  const [allowPartyInvites, setAllowPartyInvites] = useState(true);
+  const [appearanceStatus, setAppearanceStatus] = useState<'online' | 'offline' | 'dnd'>('online');
+
+  // Load user settings when modal opens
+  useEffect(() => {
+    if (currentUser?.settings) {
+      setAllowFriendRequests(currentUser.settings.allowFriendRequests ?? true);
+      setAllowPartyInvites(currentUser.settings.allowPartyInvites ?? true);
+      setAppearanceStatus(currentUser.settings.appearanceStatus ?? 'online');
+    }
+  }, [currentUser]);
 
   const canChangeUsername = () => {
     if (!currentUser?.lastUsernameChange) return true;
@@ -32,6 +48,38 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     const timeSinceLastChange = Date.now() - currentUser.lastUsernameChange;
     const timeRemaining = ONE_WEEK_MS - timeSinceLastChange;
     return Math.ceil(timeRemaining / (24 * 60 * 60 * 1000));
+  };
+
+  const handleSettingChange = async (setting: string, value: any) => {
+    if (!currentUser) return;
+    
+    try {
+      const userRef = doc(db, 'users', currentUser.id);
+      const updateData: any = {
+        [`settings.${setting}`]: value
+      };
+      
+      await updateDoc(userRef, updateData);
+      
+      // Update local state
+      const newSettings = {
+        ...currentUser.settings,
+        [setting]: value
+      };
+      
+      await updateUserProfile({ settings: newSettings });
+      
+      toast({
+        title: 'Settings Updated',
+        description: 'Your preferences have been saved',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update settings',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleUsernameChange = async () => {
@@ -154,19 +202,62 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             )}
           </div>
 
-          {/* Friend Settings - Coming Soon */}
-          <div className="space-y-2 opacity-50">
-            <Label className="text-foreground font-medium">Friend Settings</Label>
-            <div className="p-3 bg-secondary/20 rounded-lg border border-border">
-              <p className="text-sm text-muted-foreground">Coming Soon</p>
+          {/* Privacy Settings */}
+          <div className="space-y-4">
+            <Label className="text-foreground font-medium text-lg">Privacy Settings</Label>
+            
+            {/* Allow Friend Requests */}
+            <div className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg border border-border">
+              <div className="space-y-0.5">
+                <Label className="text-foreground">Allow Friend Requests</Label>
+                <p className="text-sm text-muted-foreground">Let others send you friend requests</p>
+              </div>
+              <Switch
+                checked={allowFriendRequests}
+                onCheckedChange={(checked) => {
+                  setAllowFriendRequests(checked);
+                  handleSettingChange('allowFriendRequests', checked);
+                }}
+                data-testid="switch-allow-friend-requests"
+              />
             </div>
-          </div>
 
-          {/* Party Settings - Coming Soon */}
-          <div className="space-y-2 opacity-50">
-            <Label className="text-foreground font-medium">Party Settings</Label>
-            <div className="p-3 bg-secondary/20 rounded-lg border border-border">
-              <p className="text-sm text-muted-foreground">Coming Soon</p>
+            {/* Allow Party Invites */}
+            <div className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg border border-border">
+              <div className="space-y-0.5">
+                <Label className="text-foreground">Allow Party Invites</Label>
+                <p className="text-sm text-muted-foreground">Let others invite you to parties</p>
+              </div>
+              <Switch
+                checked={allowPartyInvites}
+                onCheckedChange={(checked) => {
+                  setAllowPartyInvites(checked);
+                  handleSettingChange('allowPartyInvites', checked);
+                }}
+                data-testid="switch-allow-party-invites"
+              />
+            </div>
+
+            {/* Appearance Status */}
+            <div className="space-y-2 p-3 bg-secondary/20 rounded-lg border border-border">
+              <Label className="text-foreground">Appearance Status</Label>
+              <p className="text-sm text-muted-foreground mb-2">Choose how you appear to others</p>
+              <Select
+                value={appearanceStatus}
+                onValueChange={(value: 'online' | 'offline' | 'dnd') => {
+                  setAppearanceStatus(value);
+                  handleSettingChange('appearanceStatus', value);
+                }}
+              >
+                <SelectTrigger className="w-full bg-background" data-testid="select-appearance-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="online">Online - Appear as online to everyone</SelectItem>
+                  <SelectItem value="offline">Offline - Appear as offline to everyone</SelectItem>
+                  <SelectItem value="dnd">Do Not Disturb - Appear as busy</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
