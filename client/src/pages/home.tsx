@@ -465,7 +465,7 @@ export default function HomePage() {
           onClick={() => setFriendsSidebarOpen(true)}
           data-testid="button-open-friends"
         >
-          <Users className="h-6 w-6" />
+          <Users className="h-6 w-6 text-foreground" />
           {unreadNotifications > 0 && (
             <span className="absolute -top-1 -right-1 bg-chart-3 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
               {unreadNotifications}
@@ -483,7 +483,7 @@ export default function HomePage() {
           onClick={handleSignOut}
           data-testid="button-signout"
         >
-          <LogOut className="h-5 w-5" />
+          <LogOut className="h-5 w-5 text-foreground" />
         </Button>
       </div>
 
