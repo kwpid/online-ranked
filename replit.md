@@ -86,6 +86,8 @@ Preferred communication style: Simple, everyday language.
 - Leader promotion on member leave
 - Automatic party deletion when empty
 - Party invitation system
+- Request to Join Party with leader approval (accept/decline)
+- Auto-leave party when user closes tab/browser
 - Member kick functionality for leaders
 
 ### Social Features
@@ -98,9 +100,20 @@ Preferred communication style: Simple, everyday language.
 
 **Notification System:**
 - Friend requests
-- Party invitations
+- Party invitations  
+- Party join requests with leader approval
 - System notifications
-- Toast-based UI notifications
+- Toast-based UI notifications with auto-dismiss (4 seconds)
+
+**Matchmaking/Queue System:**
+- Play mode selection popup (Casual/Ranked/Private Match)
+- Casual queue with FFA, 2V2, 3V3 options
+- Party size validation for queue types:
+  - FFA: Solo or no party only
+  - 2V2: Party of 2 or solo queue
+  - 3V3: Party of 2-3 or solo queue
+- Ranked mode (coming soon)
+- Private match functionality (coming soon)
 
 ## External Dependencies
 
