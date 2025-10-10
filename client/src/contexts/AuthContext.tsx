@@ -8,7 +8,6 @@ import {
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from '@/lib/firebase';
 import { User, InsertUser } from '@shared/schema';
-import { notificationService, cleanupService } from '@/lib/firebaseService';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -98,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  // Handle tab visibility changes - set offline when tab is not visible
+  // Handle tab visibility changes and periodic activity updates
   useEffect(() => {
     if (!currentUser) return;
 
@@ -130,11 +129,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     }
 
+    // Periodic activity update (every 30 seconds)
+    const activityInterval = setInterval(async () => {
+      if (!document.hidden) {
+        const userRef = doc(db, 'users', userId);
+        await updateDoc(userRef, { 
+          status: 'online',
+          currentActivity: 'In Menu'
+        });
+      }
+    }, 30000); // 30 seconds
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Only set offline on unmount, not on every re-render
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(activityInterval);
     };
   }, [currentUser?.id]);
 
