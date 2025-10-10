@@ -9,6 +9,7 @@ import { SettingsModal } from '@/components/SettingsModal';
 import { PartyChatBox } from '@/components/PartyChatBox';
 import { useToast } from '@/hooks/use-toast';
 import { partyService } from '@/lib/firebaseService';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, 
   LogOut,
@@ -503,29 +504,44 @@ export default function HomePage() {
         <div className="flex flex-col items-center gap-4 w-full max-w-6xl">
           {/* Player cards - horizontal on desktop, vertical stack on mobile */}
           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 w-full justify-center">
-            {partyMembers.length > 0 ? (
-              partyMembers.map(member => (
-                <div key={member.id} className="w-full md:w-auto max-w-sm md:max-w-none">
+            <AnimatePresence mode="popLayout">
+              {partyMembers.length > 0 ? (
+                partyMembers.map(member => (
+                  <motion.div
+                    key={member.id}
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full md:w-auto max-w-sm md:max-w-none"
+                  >
+                    <PartyMemberCard
+                      user={member}
+                      isLocalPlayer={member.id === currentUser.id}
+                      isPartyLeader={member.id === currentParty?.leaderId}
+                      canManage={isPartyLeader}
+                      scale={member.id === currentUser.id ? 1.1 : 1}
+                      onKick={handleKickMember}
+                      onPromote={handlePromoteMember}
+                    />
+                  </motion.div>
+                ))
+              ) : (
+                <motion.div
+                  key="solo-player"
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full md:w-auto max-w-sm md:max-w-none"
+                >
                   <PartyMemberCard
-                    user={member}
-                    isLocalPlayer={member.id === currentUser.id}
-                    isPartyLeader={member.id === currentParty?.leaderId}
-                    canManage={isPartyLeader}
-                    scale={member.id === currentUser.id ? 1.1 : 1}
-                    onKick={handleKickMember}
-                    onPromote={handlePromoteMember}
+                    user={currentUser}
+                    isLocalPlayer={true}
+                    scale={1.1}
                   />
-                </div>
-              ))
-            ) : (
-              <div className="w-full md:w-auto max-w-sm md:max-w-none">
-                <PartyMemberCard
-                  user={currentUser}
-                  isLocalPlayer={true}
-                  scale={1.1}
-                />
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           
           {/* Leave Party Button */}
