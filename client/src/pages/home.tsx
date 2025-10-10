@@ -8,6 +8,8 @@ import { ProfileModal } from '@/components/ProfileModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { PartyChatBox } from '@/components/PartyChatBox';
 import AdminPanelDialog from '@/components/AdminPanelDialog';
+import { PlayModeDialog } from '@/components/PlayModeDialog';
+import { CasualQueueDialog } from '@/components/CasualQueueDialog';
 import { useToast } from '@/hooks/use-toast';
 import { partyService } from '@/lib/firebaseService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,6 +45,8 @@ export default function HomePage() {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
+  const [playModeDialogOpen, setPlayModeDialogOpen] = useState(false);
+  const [casualQueueDialogOpen, setCasualQueueDialogOpen] = useState(false);
   
   const [currentParty, setCurrentParty] = useState<Party | null>(null);
   const [partyMembers, setPartyMembers] = useState<User[]>([]);
@@ -149,6 +153,17 @@ export default function HomePage() {
         title: 'Error',
         description: 'Failed to sign out',
         variant: 'destructive',
+      });
+    }
+  };
+
+  const handlePlayModeSelect = (mode: 'casual' | 'ranked' | 'private') => {
+    if (mode === 'casual') {
+      setCasualQueueDialogOpen(true);
+    } else if (mode === 'private') {
+      toast({
+        title: 'Private Match',
+        description: 'Private match functionality coming soon!',
       });
     }
   };
@@ -619,8 +634,8 @@ export default function HomePage() {
       {/* Desktop Navigation - Hidden on mobile */}
       <div className="hidden md:flex absolute bottom-8 left-8 flex-col gap-3 z-20">
         <Button
-          disabled
-          className="font-display text-lg font-bold uppercase tracking-wider px-8 py-6 bg-secondary/20 backdrop-blur-sm border-2 border-border/30 opacity-40 cursor-not-allowed"
+          onClick={() => setPlayModeDialogOpen(true)}
+          className="font-display text-lg font-bold uppercase tracking-wider px-8 py-6 bg-card/80 backdrop-blur-sm border-2 border-primary/30 hover:border-primary hover:scale-105 transition-all duration-200"
           data-testid="button-play"
         >
           Play
@@ -676,9 +691,9 @@ export default function HomePage() {
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border z-20 safe-area-inset-bottom">
         <div className="grid grid-cols-6 gap-1 p-2">
           <Button
-            disabled
+            onClick={() => setPlayModeDialogOpen(true)}
             variant="ghost"
-            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium opacity-40 cursor-not-allowed"
+            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium"
             data-testid="button-play-mobile"
           >
             <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -768,6 +783,18 @@ export default function HomePage() {
       <AdminPanelDialog
         open={adminPanelOpen}
         onOpenChange={setAdminPanelOpen}
+      />
+
+      <PlayModeDialog
+        isOpen={playModeDialogOpen}
+        onClose={() => setPlayModeDialogOpen(false)}
+        onSelectMode={handlePlayModeSelect}
+      />
+
+      <CasualQueueDialog
+        isOpen={casualQueueDialogOpen}
+        onClose={() => setCasualQueueDialogOpen(false)}
+        partySize={currentParty ? currentParty.memberIds.length : 0}
       />
 
       {/* Party Chat - Only show when in a party */}
