@@ -57,35 +57,35 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl bg-card text-card-foreground border-border">
+      <DialogContent className="w-[95vw] max-w-2xl bg-card text-card-foreground border-border max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-foreground">Edit Profile</DialogTitle>
+          <DialogTitle className="text-xl md:text-2xl font-bold text-foreground">Edit Profile</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-4 md:space-y-6 py-2 md:py-4">
           {/* Avatar Preview */}
-          <div className="flex flex-col items-center gap-4">
-            <Avatar className="h-32 w-32 border-4 border-primary/30">
+          <div className="flex flex-col items-center gap-3 md:gap-4">
+            <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-primary/30">
               <AvatarImage src={photoURL || currentUser?.photoURL || undefined} />
-              <AvatarFallback className="bg-primary/20 text-primary text-4xl">
+              <AvatarFallback className="bg-primary/20 text-primary text-3xl md:text-4xl">
                 {displayName.slice(0, 2).toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs md:text-sm text-muted-foreground">
               Preview of your profile picture
             </p>
           </div>
 
           {/* Display Name */}
           <div className="space-y-2">
-            <Label htmlFor="displayName" className="text-foreground font-medium">
+            <Label htmlFor="displayName" className="text-sm md:text-base text-foreground font-medium">
               Display Name
             </Label>
             <Input
               id="displayName"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="bg-background border-2 focus:ring-primary"
+              className="bg-background border-2 focus:ring-primary text-base touch-manipulation h-12"
               maxLength={30}
               data-testid="input-display-name"
             />
@@ -96,7 +96,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
           {/* Photo URL */}
           <div className="space-y-2">
-            <Label htmlFor="photoURL" className="text-foreground font-medium">
+            <Label htmlFor="photoURL" className="text-sm md:text-base text-foreground font-medium">
               Profile Picture URL (Optional)
             </Label>
             <Input
@@ -104,7 +104,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               value={photoURL}
               onChange={(e) => setPhotoURL(e.target.value)}
               placeholder="https://example.com/photo.jpg"
-              className="bg-background border-2 focus:ring-primary"
+              className="bg-background border-2 focus:ring-primary text-base touch-manipulation h-12"
               data-testid="input-photo-url"
             />
             <p className="text-xs text-muted-foreground">
@@ -138,11 +138,12 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-border">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t border-border">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isSaving}
+            className="touch-manipulation h-11"
             data-testid="button-cancel-profile"
           >
             Cancel
@@ -150,6 +151,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           <Button
             onClick={handleSave}
             disabled={isSaving}
+            className="touch-manipulation h-11"
             data-testid="button-save-profile"
           >
             {isSaving ? 'Saving...' : 'Save Changes'}

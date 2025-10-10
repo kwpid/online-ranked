@@ -464,20 +464,32 @@ export default function HomePage() {
   const isPartyLeader = currentParty?.leaderId === currentUser.id;
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-background to-background"></div>
 
-      {/* Top-right: Friends icon */}
-      <div className="absolute top-6 right-6 z-30">
+      {/* Mobile-responsive header */}
+      <div className="relative z-30 flex justify-between items-center p-4 md:p-6">
+        {/* Sign out button */}
         <Button
           size="icon"
           variant="outline"
-          className="relative h-12 w-12 border-2"
+          className="h-10 w-10 md:h-12 md:w-12 border-2 touch-manipulation"
+          onClick={handleSignOut}
+          data-testid="button-signout"
+        >
+          <LogOut className="h-4 w-4 md:h-5 md:w-5 text-foreground" />
+        </Button>
+
+        {/* Friends button */}
+        <Button
+          size="icon"
+          variant="outline"
+          className="relative h-10 w-10 md:h-12 md:w-12 border-2 touch-manipulation"
           onClick={() => setFriendsSidebarOpen(true)}
           data-testid="button-open-friends"
         >
-          <Users className="h-6 w-6 text-foreground" />
+          <Users className="h-5 w-5 md:h-6 md:w-6 text-foreground" />
           {unreadNotifications > 0 && (
             <span className="absolute -top-1 -right-1 bg-chart-3 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
               {unreadNotifications}
@@ -486,43 +498,31 @@ export default function HomePage() {
         </Button>
       </div>
 
-      {/* Top-left: Sign out */}
-      <div className="absolute top-6 left-6 z-30">
-        <Button
-          size="icon"
-          variant="outline"
-          className="h-12 w-12 border-2"
-          onClick={handleSignOut}
-          data-testid="button-signout"
-        >
-          <LogOut className="h-5 w-5 text-foreground" />
-        </Button>
-      </div>
-
-      {/* Center: Player cards */}
-      <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-8">
+      {/* Center: Player cards - Responsive layout */}
+      <div className="relative flex-1 flex items-center justify-center z-10 px-4 py-8 md:py-0 pb-32 md:pb-0">
+        <div className="flex flex-col items-center gap-4 w-full max-w-6xl">
+          {/* Player cards - horizontal on desktop, vertical stack on mobile */}
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 w-full justify-center">
             {partyMembers.length > 0 ? (
               partyMembers.map(member => (
-                <div key={member.id} className="pointer-events-auto">
+                <div key={member.id} className="w-full md:w-auto max-w-sm md:max-w-none">
                   <PartyMemberCard
                     user={member}
                     isLocalPlayer={member.id === currentUser.id}
                     isPartyLeader={member.id === currentParty?.leaderId}
                     canManage={isPartyLeader}
-                    scale={member.id === currentUser.id ? 1.2 : 1}
+                    scale={member.id === currentUser.id ? 1.1 : 1}
                     onKick={handleKickMember}
                     onPromote={handlePromoteMember}
                   />
                 </div>
               ))
             ) : (
-              <div className="pointer-events-auto">
+              <div className="w-full md:w-auto max-w-sm md:max-w-none">
                 <PartyMemberCard
                   user={currentUser}
                   isLocalPlayer={true}
-                  scale={1.2}
+                  scale={1.1}
                 />
               </div>
             )}
@@ -530,23 +530,22 @@ export default function HomePage() {
           
           {/* Leave Party Button */}
           {currentParty && (
-            <div className="pointer-events-auto">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleLeaveParty}
-                data-testid="button-leave-party"
-              >
-                <UserMinus className="h-4 w-4 mr-2" />
-                Leave Party
-              </Button>
-            </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="touch-manipulation"
+              onClick={handleLeaveParty}
+              data-testid="button-leave-party"
+            >
+              <UserMinus className="h-4 w-4 mr-2" />
+              Leave Party
+            </Button>
           )}
         </div>
       </div>
 
-      {/* Bottom-left: Navigation buttons */}
-      <div className="absolute bottom-8 left-8 flex flex-col gap-3 z-20">
+      {/* Desktop Navigation - Hidden on mobile */}
+      <div className="hidden md:flex absolute bottom-8 left-8 flex-col gap-3 z-20">
         <Button
           disabled
           className="font-display text-lg font-bold uppercase tracking-wider px-8 py-6 bg-secondary/20 backdrop-blur-sm border-2 border-border/30 opacity-40 cursor-not-allowed"
@@ -589,6 +588,78 @@ export default function HomePage() {
         >
           Settings
         </Button>
+      </div>
+
+      {/* Mobile Bottom Navigation - Only visible on mobile */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border z-20 safe-area-inset-bottom">
+        <div className="grid grid-cols-6 gap-1 p-2">
+          <Button
+            disabled
+            variant="ghost"
+            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium opacity-40 cursor-not-allowed"
+            data-testid="button-play-mobile"
+          >
+            <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+              <span className="text-xs">▶</span>
+            </div>
+            <span>Play</span>
+          </Button>
+          <Button
+            disabled
+            variant="ghost"
+            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium opacity-40 cursor-not-allowed"
+            data-testid="button-shop-mobile"
+          >
+            <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+              <span className="text-xs">🛒</span>
+            </div>
+            <span>Shop</span>
+          </Button>
+          <Button
+            disabled
+            variant="ghost"
+            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium opacity-40 cursor-not-allowed"
+            data-testid="button-inventory-mobile"
+          >
+            <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+              <span className="text-xs">📦</span>
+            </div>
+            <span>Items</span>
+          </Button>
+          <Button
+            disabled
+            variant="ghost"
+            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium opacity-40 cursor-not-allowed"
+            data-testid="button-pass-mobile"
+          >
+            <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+              <span className="text-xs">⭐</span>
+            </div>
+            <span>Pass</span>
+          </Button>
+          <Button
+            onClick={() => setProfileModalOpen(true)}
+            variant="ghost"
+            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium touch-manipulation hover:bg-primary/10"
+            data-testid="button-profile-mobile"
+          >
+            <div className="h-6 w-6 rounded-full bg-primary/30 flex items-center justify-center">
+              <span className="text-xs">👤</span>
+            </div>
+            <span>Profile</span>
+          </Button>
+          <Button
+            onClick={() => setSettingsModalOpen(true)}
+            variant="ghost"
+            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium touch-manipulation hover:bg-primary/10"
+            data-testid="button-settings-mobile"
+          >
+            <div className="h-6 w-6 rounded-full bg-primary/30 flex items-center justify-center">
+              <span className="text-xs">⚙️</span>
+            </div>
+            <span>Settings</span>
+          </Button>
+        </div>
       </div>
 
       {/* Modals and Sidebars */}

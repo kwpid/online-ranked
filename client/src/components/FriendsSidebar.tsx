@@ -250,14 +250,15 @@ export function FriendsSidebar({
         data-testid="friends-sidebar-backdrop"
       />
 
-      {/* Sidebar */}
-      <div className="fixed right-0 top-0 h-screen w-96 bg-card border-l border-border z-50 flex flex-col animate-in slide-in-from-right duration-300">
+      {/* Sidebar - Full screen on mobile, sidebar on desktop */}
+      <div className="fixed right-0 top-0 h-screen w-full md:w-96 bg-card md:border-l border-border z-50 flex flex-col animate-in slide-in-from-right duration-300">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex items-center justify-between p-4 border-b border-border safe-area-inset-top">
           <h2 className="text-xl font-bold text-foreground">Friends</h2>
           <Button
             variant="ghost"
             size="icon"
+            className="touch-manipulation"
             onClick={onClose}
             data-testid="button-close-friends"
           >
@@ -267,19 +268,35 @@ export function FriendsSidebar({
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="w-full justify-start rounded-none border-b border-border bg-transparent p-0 overflow-x-auto">
+          <TabsList className="w-full justify-start rounded-none border-b border-border bg-transparent p-0 overflow-x-auto flex-nowrap">
             {isInParty && (
-              <TabsTrigger value="party" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary" data-testid="tab-party">
+              <TabsTrigger 
+                value="party" 
+                className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary touch-manipulation whitespace-nowrap" 
+                data-testid="tab-party"
+              >
                 Party ({partyMembers.length})
               </TabsTrigger>
             )}
-            <TabsTrigger value="online" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary" data-testid="tab-online-friends">
+            <TabsTrigger 
+              value="online" 
+              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary touch-manipulation whitespace-nowrap" 
+              data-testid="tab-online-friends"
+            >
               Online ({onlineFriends.length})
             </TabsTrigger>
-            <TabsTrigger value="all" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary" data-testid="tab-all-friends">
+            <TabsTrigger 
+              value="all" 
+              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary touch-manipulation whitespace-nowrap" 
+              data-testid="tab-all-friends"
+            >
               All ({friends.length})
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary relative" data-testid="tab-notifications">
+            <TabsTrigger 
+              value="notifications" 
+              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary relative touch-manipulation whitespace-nowrap" 
+              data-testid="tab-notifications"
+            >
               Notifications
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-chart-3 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -287,10 +304,18 @@ export function FriendsSidebar({
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="recent" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary" data-testid="tab-recently-played">
+            <TabsTrigger 
+              value="recent" 
+              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary touch-manipulation whitespace-nowrap" 
+              data-testid="tab-recently-played"
+            >
               Recent
             </TabsTrigger>
-            <TabsTrigger value="add" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary" data-testid="tab-add-friend">
+            <TabsTrigger 
+              value="add" 
+              className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary touch-manipulation whitespace-nowrap" 
+              data-testid="tab-add-friend"
+            >
               Add
             </TabsTrigger>
           </TabsList>

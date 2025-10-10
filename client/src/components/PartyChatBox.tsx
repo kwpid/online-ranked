@@ -76,10 +76,10 @@ export function PartyChatBox({ partyId }: PartyChatBoxProps) {
 
   if (isMinimized) {
     return (
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40">
         <Button
           onClick={() => setIsMinimized(false)}
-          className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 shadow-lg"
+          className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg touch-manipulation"
           size="icon"
         >
           <MessageSquare className="h-6 w-6" />
@@ -89,7 +89,7 @@ export function PartyChatBox({ partyId }: PartyChatBoxProps) {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-card border-2 border-border rounded-lg shadow-2xl z-40 flex flex-col">
+    <div className="fixed bottom-20 md:bottom-6 right-2 md:right-6 left-2 md:left-auto w-auto md:w-96 h-[400px] md:h-[500px] bg-card border-2 border-border rounded-lg shadow-2xl z-40 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-border bg-secondary/30">
         <div className="flex items-center gap-2">
@@ -100,7 +100,7 @@ export function PartyChatBox({ partyId }: PartyChatBoxProps) {
           variant="ghost"
           size="icon"
           onClick={() => setIsMinimized(true)}
-          className="h-8 w-8"
+          className="h-8 w-8 touch-manipulation"
         >
           <X className="h-4 w-4" />
         </Button>

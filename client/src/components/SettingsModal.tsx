@@ -115,12 +115,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl bg-card text-card-foreground border-border">
+      <DialogContent className="w-[95vw] max-w-2xl bg-card text-card-foreground border-border max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-foreground">Settings</DialogTitle>
+          <DialogTitle className="text-xl md:text-2xl font-bold text-foreground">Settings</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-4 md:space-y-6 py-2 md:py-4">
           {/* Current Username */}
           <div className="space-y-2">
             <Label className="text-foreground font-medium">Current Username</Label>
@@ -131,7 +131,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {/* Change Username */}
           <div className="space-y-2">
-            <Label htmlFor="newUsername" className="text-foreground font-medium">
+            <Label htmlFor="newUsername" className="text-sm md:text-base text-foreground font-medium">
               New Username
             </Label>
             <Input
@@ -139,7 +139,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               value={newUsername}
               onChange={(e) => setNewUsername(e.target.value)}
               placeholder="Enter new username"
-              className="bg-background border-2 focus:ring-primary"
+              className="bg-background border-2 focus:ring-primary text-base touch-manipulation h-12"
               disabled={!canChangeUsername()}
               data-testid="input-new-username"
             />
@@ -172,11 +172,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-border">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t border-border">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isSaving}
+            className="touch-manipulation h-11"
             data-testid="button-cancel-settings"
           >
             Close
@@ -184,6 +185,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           <Button
             onClick={handleUsernameChange}
             disabled={isSaving || !canChangeUsername() || !newUsername.trim()}
+            className="touch-manipulation h-11"
             data-testid="button-save-username"
           >
             {isSaving ? 'Saving...' : 'Change Username'}
