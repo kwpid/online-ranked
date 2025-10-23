@@ -1,6 +1,16 @@
 import { User } from '@shared/schema';
 
+const OFFLINE_THRESHOLD = 2 * 60 * 1000;
+
 export function getDisplayStatus(user: User): 'online' | 'offline' | 'dnd' {
+  const now = Date.now();
+  const lastActive = user.lastActive || 0;
+  const timeSinceActive = now - lastActive;
+  
+  if (timeSinceActive > OFFLINE_THRESHOLD) {
+    return 'offline';
+  }
+  
   return user.settings?.appearanceStatus ?? 'online';
 }
 

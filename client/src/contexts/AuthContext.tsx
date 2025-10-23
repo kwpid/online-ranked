@@ -134,23 +134,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!currentUser) return;
 
     const userId = currentUser.id;
-    const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
     let lastActivityTime = Date.now();
 
-    // Handle tab/window close - set status to offline
-    // Using pagehide event which is more reliable than beforeunload
     const handlePageHide = () => {
       const userRef = doc(db, 'users', userId);
-      // Best effort attempt to update status on page close
-      // Note: This may not always complete before the page unloads
       updateDoc(userRef, { 
-        status: 'offline'
-      }).catch(() => {
-        // Silently fail - this is expected during page unload
-      });
+        status: 'offline',
+        lastActive: Date.now()
+      }).catch(() => {});
     };
 
-    // Set initial status to online with current timestamp
     const userRef = doc(db, 'users', userId);
     updateDoc(userRef, { 
       status: 'online',
@@ -158,40 +152,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       lastActive: Date.now()
     });
 
-    // Track user activity
     const updateActivity = () => {
       lastActivityTime = Date.now();
     };
 
-    // Activity listeners
     window.addEventListener('mousemove', updateActivity);
     window.addEventListener('keydown', updateActivity);
     window.addEventListener('click', updateActivity);
     window.addEventListener('scroll', updateActivity);
 
-    // Periodic check for inactivity and update lastActive
     const activityInterval = setInterval(async () => {
       const currentTime = Date.now();
       const timeSinceLastActivity = currentTime - lastActivityTime;
       const userRef = doc(db, 'users', userId);
 
       if (timeSinceLastActivity >= INACTIVITY_TIMEOUT) {
-        // User is inactive for 5+ minutes, set to offline
         await updateDoc(userRef, { 
           status: 'offline',
           lastActive: lastActivityTime
         });
       } else {
-        // User is active, update lastActive and keep online
         await updateDoc(userRef, { 
           status: 'online',
           currentActivity: 'In Menu',
           lastActive: currentTime
         });
       }
-    }, 30000); // Check every 30 seconds
+    }, 30000);
 
-    // Listen for tab/window close - use both events for better coverage
     window.addEventListener('pagehide', handlePageHide);
     window.addEventListener('beforeunload', handlePageHide);
 

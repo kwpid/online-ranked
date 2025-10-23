@@ -534,6 +534,7 @@ export default function HomePage() {
   }
 
   const isPartyLeader = currentParty?.leaderId === currentUser.id;
+  const canStartGame = !currentParty || isPartyLeader;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
@@ -634,8 +635,9 @@ export default function HomePage() {
       {/* Desktop Navigation - Hidden on mobile */}
       <div className="hidden md:flex absolute bottom-8 left-8 flex-col gap-3 z-20">
         <Button
-          onClick={() => setPlayModeDialogOpen(true)}
-          className="font-display text-lg font-bold uppercase tracking-wider px-8 py-6 bg-card/80 backdrop-blur-sm border-2 border-primary/30 hover:border-primary hover:scale-105 transition-all duration-200"
+          onClick={() => canStartGame && setPlayModeDialogOpen(true)}
+          disabled={!canStartGame}
+          className="font-display text-lg font-bold uppercase tracking-wider px-8 py-6 bg-card/80 backdrop-blur-sm border-2 border-primary/30 hover:border-primary hover:scale-105 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
           data-testid="button-play"
         >
           Play
@@ -691,9 +693,10 @@ export default function HomePage() {
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border z-20 safe-area-inset-bottom">
         <div className="grid grid-cols-6 gap-1 p-2">
           <Button
-            onClick={() => setPlayModeDialogOpen(true)}
+            onClick={() => canStartGame && setPlayModeDialogOpen(true)}
+            disabled={!canStartGame}
             variant="ghost"
-            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium"
+            className="flex flex-col items-center justify-center gap-1 h-16 text-xs font-medium disabled:opacity-40 disabled:cursor-not-allowed"
             data-testid="button-play-mobile"
           >
             <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
