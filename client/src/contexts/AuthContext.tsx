@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await updateDoc(userRef, { 
           status: 'online',
           currentActivity: 'In Menu',
-          lastActive: currentTime
+          lastActive: lastActivityTime
         });
       }
     }, 30000);
